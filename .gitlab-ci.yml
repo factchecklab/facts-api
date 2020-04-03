@@ -4,10 +4,16 @@ stages:
 test:
   stage: test
   image: node:lts
+  services:
+  - postgres:12.2
+  variables:
+    POSTGRES_PASSWORD: postgres
+    DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
   before_script:
     - yarn install
   script:
     - yarn lint
+    - yarn migrate
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
