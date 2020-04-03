@@ -1,5 +1,7 @@
 'use strict';
 
+/* eslint-disable camelcase */
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('assets', {
