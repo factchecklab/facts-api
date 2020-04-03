@@ -1,0 +1,11 @@
+require('@babel/register');
+
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+module.exports = {
+  'models-path': path.resolve('src', 'models'),
+  'url': process.env.DATABASE_URL
+}

@@ -1,8 +1,8 @@
 import { ApolloServer } from 'apollo-server';
 
-import models, { sequelize } from './models'
-import schema from './schema'
-import resolvers from './resolvers'
+import models, { sequelize } from './models';
+import schema from './schema';
+import resolvers from './resolvers';
 
 sequelize.sync();
 
@@ -10,16 +10,15 @@ sequelize.sync();
 // definition and your set of resolvers.
 const server = new ApolloServer({
   typeDefs: schema,
-  context: async () => {
+  context: () => {
     return {
-      models
-    }
+      models,
+    };
   },
-  resolvers
+  resolvers,
 });
 
 // The `listen` method launches a web server.
 server.listen().then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });
-

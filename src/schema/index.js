@@ -1,15 +1,15 @@
 import gql from 'graphql-tag';
 
-import partner from './partner';
-import book from './book';
+import entity from './entity';
 import topic from './topic';
-import report from './report';
 import response from './response';
 import attachment from './attachment';
 import asset from './asset';
+import message from './message';
+import report from './report';
 
 const link = gql`
-  #scalar Date
+  scalar Date
 
   enum Conclusion {
     truthy
@@ -22,9 +22,9 @@ const link = gql`
     _: Boolean
   }
 
-  #type Mutation {
-  #  _: Boolean
-  #}
+  type Mutation {
+    _: Boolean
+  }
 
   #type Subscription {
   #  _: Boolean
@@ -33,12 +33,11 @@ const link = gql`
 
 export default [
   link,
-  partner,
-  book,
+  entity,
   topic,
-  report,
   response,
   attachment,
-  asset
+  asset,
+  message,
+  report,
 ];
-

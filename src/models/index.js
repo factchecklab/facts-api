@@ -7,6 +7,9 @@ let sequelize;
 if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
+    define: {
+      timestamps: false,
+    },
   });
 } else {
   sequelize = new Sequelize(
@@ -15,21 +18,24 @@ if (process.env.DATABASE_URL) {
     process.env.DATABASE_PASSWORD,
     {
       dialect: 'postgres',
-    },
+      define: {
+        timestamps: false,
+      },
+    }
   );
 }
 
 const models = {
-  Topic: sequelize.import('./topic'),
-  Report: sequelize.import('./report'),
   Asset: sequelize.import('./asset'),
   Attachment: sequelize.import('./attachment'),
-  Partner: sequelize.import('./partner'),
-  ReportLog: sequelize.import('./report_log'),
-  Response: sequelize.import('./response')
+  Entity: sequelize.import('./entity'),
+  Message: sequelize.import('./message'),
+  Report: sequelize.import('./report'),
+  Response: sequelize.import('./response'),
+  Topic: sequelize.import('./topic'),
 };
 
-Object.keys(models).forEach(key => {
+Object.keys(models).forEach((key) => {
   if ('associate' in models[key]) {
     models[key].associate(models);
   }

@@ -8,8 +8,3 @@ export default gql`
     asset: Asset
   }
 `;
-
-
-
-
-

@@ -1,18 +1,15 @@
 import Sequelize from 'sequelize';
 
 export default (sequelize, DataTypes) => {
-  class Asset extends Sequelize.Model {}
+  class Entity extends Sequelize.Model {}
 
-  Asset.init(
+  Entity.init(
     {
-      mimetype: {
+      name: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      path: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
+      homepage: DataTypes.TEXT,
       createdAt: {
         field: 'created_at',
         type: DataTypes.DATE,
@@ -28,11 +25,16 @@ export default (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'asset',
+      modelName: 'entity',
     }
   );
 
-  Asset.associate = (models) => {};
+  Entity.associate = (models) => {
+    Entity.hasMany(models.Response, {
+      as: 'responses',
+      foreignKey: 'entity_id',
+    });
+  };
 
-  return Asset;
+  return Entity;
 };

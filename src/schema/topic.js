@@ -2,7 +2,14 @@ import gql from 'graphql-tag';
 
 export default gql`
   extend type Query {
-    topics: [Topic!]
+    topics(
+      keyword: String
+      closed: Boolean = false
+      offset: Int = 0
+      limit: Int = 20
+    ): [Topic!]!
+    topic(id: ID!): Topic
+    similarTopics(content: String, url: String, reportId: ID): [Topic!]!
   }
 
   type Topic {
@@ -11,9 +18,10 @@ export default gql`
     summary: String
     published: Boolean!
     conclusion: Conclusion!
-    originalReport: Report!
-    responses: [Response!]
+    message: Message!
+    responses: [Response!]!
+    reports: [Report!]!
+    createdAt: Date!
+    updatedAt: Date!
   }
 `;
-
-

@@ -1,8 +1,9 @@
 import gql from 'graphql-tag';
 
 export default gql`
-  type Asset {
+  type Message {
     id: ID!
-    mimetype: String!
+    content: String!
+    attachments: [Attachment!]
   }
 `;

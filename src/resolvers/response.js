@@ -1,12 +1,10 @@
 export default {
   Response: {
-    partner: async (response, args, { models }) => {
-      return await response.getPartner();
+    entity: (response, args, { models }) => {
+      return response.getEntity();
     },
-    attachments: async (response, args, { models }) => {
-      return await responses.getAttachments();
-    }
-  }
-
-}
-
+    attachments: (response, args, { models }) => {
+      return responses.getAttachments();
+    },
+  },
+};
