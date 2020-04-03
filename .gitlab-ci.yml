@@ -1,0 +1,28 @@
+stages:
+  - test
+
+test:
+  stage: test
+  image: node:lts
+  before_script:
+    - yarn install
+  script:
+    - yarn lint
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  except:
+    - schedules
+
+audit:
+  stage: test
+  image: node:lts
+  before_script:
+    - yarn install
+  script:
+    - yarn audit
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
