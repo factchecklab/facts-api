@@ -2,14 +2,13 @@ import gql from 'graphql-tag';
 
 export default gql`
   extend type Query {
-    partners: [Partner!]
-    partner(id: ID!): Partner
+    entities: [Entity!]
+    entity(id: ID!): Entity
   }
 
-  type Partner {
+  type Entity {
     id: ID!
     name: String!
     homepage: String
   }
 `;
-

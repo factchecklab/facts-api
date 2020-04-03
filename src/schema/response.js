@@ -1,18 +1,19 @@
 import gql from 'graphql-tag';
 
 export default gql`
+  enum ResponseType {
+    review
+    response
+  }
+
   type Response {
     id: ID!
-    title: String!
     content: String!
+    type: ResponseType!
     published: Boolean!
     conclusion: Conclusion!
-    partner: Partner!
+    entity: Entity!
     topic: Topic!
     attachments: [Attachment!]
   }
 `;
-
-
-
-

@@ -2,27 +2,31 @@
 
 ## Getting Started
 
-1. Copy .env to .env.sample
+1. Copy .env from .env.sample
 2. Run yarn install
+2. Run yarn migrate
 3. Run yarn start
 
 Or you can use `docker-compose up`. The API is available on port 4000.
 
-Currently, the server creates database schema upon server starts.
+Currently, the server creates database schema upon server starts. But it is
+recommended that you run database schema migration.
+
+To seed data, run `yarn seed:demo`.
 
 ## TODOs
 
 The project is in active development. The current state of the project:
 
-- [ ] Prettier / Lint
+- [x] Prettier / Lint
 - [ ] Tests
-- [ ] Build commands (babel emits js into dist directory)
+- [x] Build commands (babel emits js into dist directory)
 - [ ] CI / CD
-- [ ] Database migration up/down
+- [x] Database migration up/down
 - [x] Simple queries schema and resolver, like query all and fetch by one
 - [x] Simple graph traversal, like fetching topic responses
-- [ ] Query schema to support application use cases
-- [ ] Mutation schema to support application use cases
+- [x] Query schema to support application use cases
+- [x] Mutation schema to support application use cases
 - [ ] Support published state, showing/hiding objects for all users
 - [ ] Sorting by order field, to support which response appears first
 - [ ] Assets / Attachments

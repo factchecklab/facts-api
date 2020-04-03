@@ -1,49 +1,57 @@
 import Sequelize from 'sequelize';
-
 export default (sequelize, DataTypes) => {
   class Topic extends Sequelize.Model {}
 
-  Topic.init({
-    title: {
-      type: DataTypes.TEXT,
-      allowNull: false
+  Topic.init(
+    {
+      title: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      published: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      conclusion: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      createdAt: {
+        field: 'created_at',
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('NOW()'),
+      },
+      updatedAt: {
+        field: 'updated_at',
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('NOW()'),
+      },
     },
-    summary: DataTypes.TEXT,
-    published: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false
-    },
-    conclusion: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    },
-  }, {
-    sequelize,
-    modelName: 'topic',
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  });
+    {
+      sequelize,
+      modelName: 'topic',
+    }
+  );
 
-  Topic.associate = models => {
-    Topic.belongsTo(models.Report, {
-      as: 'originalReport',
-      foreignKey: {
-        name: 'original_report_id',
-        allowNull: false
-      }
-    })
+  Topic.associate = (models) => {
     Topic.hasMany(models.Response, {
       as: 'responses',
-      foreignKey: 'topic_id'
-    })
-    Topic.hasMany(models.Attachment, {
-      as: 'attachments',
-      foreignKey: 'item_id',
-      constraints: false,
-      scope: {
-        item_type: 'topic'
-      }
-    })
+      foreignKey: 'topic_id',
+    });
+    Topic.hasMany(models.Report, {
+      as: 'reports',
+      foreignKey: 'topic_id',
+    });
+    Topic.belongsTo(models.Message, {
+      as: 'message',
+      foreignKey: {
+        name: 'message_id',
+        allowNull: false,
+      },
+    });
   };
 
   return Topic;
