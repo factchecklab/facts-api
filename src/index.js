@@ -19,6 +19,13 @@ const server = new ApolloServer({
 });
 
 // The `listen` method launches a web server.
-server.listen().then(({ url }) => {
+server.listen().then(({ server, url }) => {
   console.log(`🚀  Server ready at ${url}`);
+
+  // For nodemon
+  process.once('SIGUSR2', () => {
+    server.close(() => {
+      process.kill(process.pid, 'SIGUSR2');
+    });
+  });
 });
