@@ -8,7 +8,8 @@ if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     define: {
-      timestamps: false,
+      timestamps: true,
+      underscored: true,
     },
   });
 } else {
@@ -19,7 +20,8 @@ if (process.env.DATABASE_URL) {
     {
       dialect: 'postgres',
       define: {
-        timestamps: false,
+        timestamps: true,
+        underscored: true,
       },
     }
   );

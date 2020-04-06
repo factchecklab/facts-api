@@ -23,18 +23,6 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
       },
       location: DataTypes.TEXT,
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,
@@ -45,7 +33,7 @@ export default (sequelize, DataTypes) => {
   Attachment.associate = (models) => {
     Attachment.belongsTo(models.Asset, {
       as: 'asset',
-      foreignKey: 'asset_id',
+      foreignKey: 'assetId',
     });
   };
 

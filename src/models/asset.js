@@ -13,18 +13,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,

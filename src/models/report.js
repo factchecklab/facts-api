@@ -19,18 +19,6 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,
@@ -42,12 +30,13 @@ export default (sequelize, DataTypes) => {
     Report.belongsTo(models.Topic, {
       as: 'topic',
       foreignKey: {
-        name: 'topic_id',
+        name: 'topicId',
+        field: 'topic_id',
       },
     });
     Report.hasMany(models.Attachment, {
       as: 'attachments',
-      foreignKey: 'item_id',
+      foreignKey: 'itemId',
       constraints: false,
       scope: {
         itemType: 'report',
