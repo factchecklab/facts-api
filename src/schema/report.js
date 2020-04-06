@@ -9,6 +9,32 @@ export default gql`
       limit: Int = 20
     ): [Report!]!
     report(id: ID!): Report
+
+    """
+    Search for reports that are similar to the specified values.
+    """
+    similarReports(
+      """
+      Report ID which data will be used for similarity search. If specified,
+      the other parameters will be ignored.
+      """
+      reportId: ID
+
+      """
+      The report content.
+      """
+      content: String
+
+      """
+      Paging offset.
+      """
+      offset: Int = 0
+
+      """
+      Paging limit.
+      """
+      limit: Int = 20
+    ): [Report!]!
   }
 
   extend type Mutation {

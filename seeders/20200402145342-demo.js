@@ -1,5 +1,13 @@
 'use strict';
 
+const uuidv4 = require('uuid').v4;
+
+export const generateId = () => {
+  const buf = Buffer.alloc(16);
+  const uuid = uuidv4(null, buf);
+  return buf.toString('base64').replace(/[=\+\/]/g, '');
+};
+
 /* eslint-disable camelcase */
 
 module.exports = {
@@ -86,6 +94,7 @@ module.exports = {
               '一名剛回港正接受強製傢居檢疫人士懷疑自己感染新冠肺炎故意外出而且到處對服務員吐口水散播病毒。大家分享出去提醒其他人。一名萬寧同事懷疑中招請病假，其他同事所以才將CCTV 片段放出来',
             source: 'whatsapp',
             closed: false,
+            document_id: generateId(),
           },
           {
             topic_id: topics[1].id,
@@ -93,6 +102,7 @@ module.exports = {
               '戴口罩很重要。冠狀病毒證實是空氣傳播！日本醫生用了高科技的攝影器材，拍攝了冠狀病毒在空氣中的情況。這攝影機能攝錄0.1微米（10’000 份之一微米）',
             source: 'whatsapp',
             closed: false,
+            document_id: generateId(),
           },
           {
             topic_id: topics[1].id,
@@ -100,6 +110,7 @@ module.exports = {
               '英國首相約翰遜在社交網站證實，感染新型冠狀病毒 (3/27/19:22)',
             source: 'whatsapp',
             closed: false,
+            document_id: generateId(),
           },
         ],
         { returning: true }

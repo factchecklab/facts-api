@@ -3,8 +3,11 @@ import { ApolloServer } from 'apollo-server';
 import models, { sequelize } from './models';
 import schema from './schema';
 import resolvers from './resolvers';
+import search, { client as elastic, addHooks } from './search';
 
 sequelize.sync();
+
+addHooks(models);
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
@@ -14,6 +17,8 @@ const server = new ApolloServer({
     return {
       models,
       sequelize,
+      elastic,
+      search,
     };
   },
   resolvers,
