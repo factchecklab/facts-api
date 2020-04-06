@@ -1,0 +1,48 @@
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  image: node:lts
+  services:
+  - postgres:12.2
+  variables:
+    POSTGRES_PASSWORD: postgres
+    DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+  before_script:
+    - yarn install
+  script:
+    - yarn lint
+    - yarn migrate
+    - yarn test --passWithNoTests
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  except:
+    - schedules
+
+audit:
+  stage: test
+  image: node:lts
+  before_script:
+    - yarn install
+  script:
+    - yarn audit
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+
+build:
+  image: docker:19.03.1
+  stage: build
+  services:
+    - docker:19.03.1-dind
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
