@@ -10,51 +10,61 @@ export const generateId = () => {
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction(async (t) => {
+    const addDocumentIdColumn = async (tableName, transaction) => {
       await queryInterface.addColumn(
-        'reports',
+        tableName,
         'document_id',
         {
           type: Sequelize.TEXT,
         },
-        { transaction: t }
+        { transaction }
       );
       const rows = await queryInterface.sequelize.query(
-        'SELECT id FROM reports;',
+        `SELECT id FROM ${tableName};`,
         {
           type: Sequelize.QueryTypes.SELECT,
-          transaction: t,
+          transaction,
         }
       );
       await Promise.all(
         rows.map((row) => {
           return queryInterface.sequelize.query(
-            'UPDATE reports SET document_id = $1 WHERE id = $2',
+            `UPDATE ${tableName} SET document_id = $1 WHERE id = $2`,
             {
-              transaction: t,
+              transaction,
               bind: [generateId(), row.id],
             }
           );
         })
       );
       await queryInterface.changeColumn(
-        'reports',
+        tableName,
         'document_id',
         {
           type: Sequelize.TEXT,
           allowNull: false,
           unique: true,
         },
-        { transaction: t }
+        { transaction }
       );
+    };
+
+    return queryInterface.sequelize.transaction(async (t) => {
+      await addDocumentIdColumn('reports', t);
+      await addDocumentIdColumn('topics', t);
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('reports', 'document_id', {
-        transaction: t,
+    const removeDocumentIdColumn = (tableName, transaction) => {
+      return queryInterface.removeColumn(tableName, 'document_id', {
+        transaction,
       });
+    };
+
+    return queryInterface.sequelize.transaction(async (t) => {
+      await removeDocumentIdColumn('topics', t);
+      await removeDocumentIdColumn('reports', t);
     });
   },
 };

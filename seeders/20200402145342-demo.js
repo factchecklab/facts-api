@@ -49,12 +49,14 @@ module.exports = {
             published: true,
             conclusion: 'falsy',
             title: '家居檢疫人士吐口水散播病毒',
+            document_id: generateId(),
           },
           {
             message_id: messages[1].id,
             published: true,
             conclusion: 'truthy',
             title: '英國首相確診新型冠狀病毒',
+            document_id: generateId(),
           },
         ],
         { returning: true }
