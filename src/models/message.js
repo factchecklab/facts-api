@@ -12,18 +12,6 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,
@@ -34,11 +22,11 @@ export default (sequelize, DataTypes) => {
   Message.associate = (models) => {
     Message.hasOne(models.Topic, {
       as: 'topic',
-      foreignKey: 'message_id',
+      foreignKey: 'messageId',
     });
     Message.hasMany(models.Attachment, {
       as: 'attachments',
-      foreignKey: 'item_id',
+      foreignKey: 'itemId',
       constraints: false,
       scope: {
         itemType: 'message',

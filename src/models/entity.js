@@ -10,18 +10,6 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
       },
       homepage: DataTypes.TEXT,
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,
@@ -32,7 +20,7 @@ export default (sequelize, DataTypes) => {
   Entity.associate = (models) => {
     Entity.hasMany(models.Response, {
       as: 'responses',
-      foreignKey: 'entity_id',
+      foreignKey: 'entityId',
     });
   };
 

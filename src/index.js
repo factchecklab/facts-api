@@ -13,6 +13,7 @@ const server = new ApolloServer({
   context: () => {
     return {
       models,
+      sequelize,
     };
   },
   resolvers,

@@ -22,22 +22,11 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,
       modelName: 'response',
+      paranoid: true,
     }
   );
 
@@ -45,20 +34,22 @@ export default (sequelize, DataTypes) => {
     Response.belongsTo(models.Topic, {
       as: 'topic',
       foreignKey: {
-        name: 'topic_id',
+        name: 'topicId',
+        field: 'topic_id',
         allowNull: false,
       },
     });
     Response.belongsTo(models.Entity, {
       as: 'entity',
       foreignKey: {
-        name: 'entity_id',
+        name: 'entityId',
+        field: 'entity_id',
         allowNull: false,
       },
     });
     Response.hasMany(models.Attachment, {
       as: 'attachments',
-      foreignKey: 'item_id',
+      foreignKey: 'itemId',
       constraints: false,
       scope: {
         itemType: 'response',

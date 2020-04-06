@@ -17,38 +17,30 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      createdAt: {
-        field: 'created_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
-      updatedAt: {
-        field: 'updated_at',
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('NOW()'),
-      },
     },
     {
       sequelize,
       modelName: 'topic',
+      paranoid: true,
     }
   );
 
   Topic.associate = (models) => {
     Topic.hasMany(models.Response, {
       as: 'responses',
-      foreignKey: 'topic_id',
+      foreignKey: 'topicId',
     });
+
     Topic.hasMany(models.Report, {
       as: 'reports',
-      foreignKey: 'topic_id',
+      foreignKey: 'topicId',
     });
+
     Topic.belongsTo(models.Message, {
       as: 'message',
       foreignKey: {
-        name: 'message_id',
+        name: 'messageId',
+        field: 'message_id',
         allowNull: false,
       },
     });
