@@ -6,5 +6,7 @@ export default gql`
     type: String!
     location: String
     asset: Asset
+    createdAt: Date!
+    updatedAt: Date!
   }
 `;

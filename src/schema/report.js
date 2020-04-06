@@ -26,6 +26,8 @@ export default gql`
     closed: Boolean!
     attachments: [Attachment!]!
     topic: Topic
+    createdAt: Date!
+    updatedAt: Date!
   }
 
   input CreateReportInput {

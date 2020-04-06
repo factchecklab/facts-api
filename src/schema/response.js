@@ -21,6 +21,8 @@ export default gql`
     entity: Entity!
     topic: Topic!
     attachments: [Attachment!]
+    createdAt: Date!
+    updatedAt: Date!
   }
 
   input CreateResponseInput {

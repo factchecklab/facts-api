@@ -10,5 +10,7 @@ export default gql`
     id: ID!
     name: String!
     homepage: String
+    createdAt: Date!
+    updatedAt: Date!
   }
 `;
