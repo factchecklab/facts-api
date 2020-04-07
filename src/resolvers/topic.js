@@ -56,7 +56,7 @@ export default {
         const topic = models.Topic.build(
           {
             title: '',
-            published: false,
+            published: true, // FIXME(cheungpat): Change to default unpublished
             conclusion: 'uncertain',
             ...rest,
             message: { content: messageContent },
