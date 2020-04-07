@@ -28,6 +28,11 @@ export default gql`
     topic: Topic
     createdAt: Date!
     updatedAt: Date!
+
+    """
+    Returns topics that have similar message content for this report.
+    """
+    similarTopics: [Topic!]!
   }
 
   input CreateReportInput {
