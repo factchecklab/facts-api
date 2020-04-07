@@ -87,8 +87,22 @@ export default {
   },
 
   Report: {
+    topic: (report, args, { models }) => {
+      return report.getTopic();
+    },
+
     attachments: (report, args, { models }) => {
       return report.getAttachments();
+    },
+
+    similarTopics: async (report, args, { models, search, elastic }) => {
+      const ids = await search.Topic.searchSimilarByMessageContent(
+        elastic,
+        report.content
+      );
+      return models.Topic.findAllByDocumentIds(ids, {
+        where: { published: true },
+      });
     },
   },
 };
