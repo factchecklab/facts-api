@@ -3,34 +3,61 @@ import { NotFound } from './errors';
 
 export default {
   Query: {
-    topics: (parent, { keyword, closed, offset, limit }, { models }) => {
-      let where = {
+    topics: async (
+      parent,
+      { keyword, offset, limit },
+      { models, search, elastic }
+    ) => {
+      const where = {
         published: true,
       };
-
       if (keyword) {
-        where.title = {
-          [Op.like]: `%${keyword}%`,
-        };
+        const ids = await search.Topic.searchByKeyword(
+          elastic,
+          keyword,
+          offset,
+          limit
+        );
+        return models.Topic.findAllByDocumentIds(ids, {
+          where,
+        });
+      } else {
+        return models.Topic.findAll({
+          where,
+          offset: offset || 0,
+          limit: Math.min(limit || 20, 100),
+          order: [['createdAt', 'desc']],
+        });
       }
-
-      return models.Topic.findAll({
-        where,
-        offset: offset || 0,
-        limit: Math.min(limit || 20, 100),
-        order: [['createdAt', 'desc']],
-      });
     },
 
     topic: (parent, { id }, { models }) => {
       return models.Topic.findByPk(id);
     },
 
-    similarTopics: (parent, { content, url, reportId }, { models }) => {
-      // TODO(cheungpat): Implement similarity search
-      return models.Topic.findAll({
-        limit: 20,
-        order: [['createdAt', 'desc']],
+    similarTopics: async (
+      parent,
+      { reportId, content, offset, limit },
+      { models, search, elastic }
+    ) => {
+      let report = null;
+      if (reportId) {
+        report = await models.Report.findByPk(reportId);
+        if (!report) {
+          throw new NotFound(
+            `Could not find a Report with the id '${reportId}'`
+          );
+        }
+      }
+
+      const ids = await search.Topic.searchSimilarByMessageContent(
+        elastic,
+        report ? report.content : content,
+        offset,
+        limit
+      );
+      return models.Topic.findAllByDocumentIds(ids, {
+        where: { published: true },
       });
     },
   },

@@ -9,7 +9,22 @@ export default gql`
       limit: Int = 20
     ): [Topic!]!
     topic(id: ID!): Topic
-    similarTopics(content: String, url: String, reportId: ID): [Topic!]!
+
+    """
+    Search for topics that are similar to the specified values.
+    """
+    similarTopics(
+      """
+      Report ID which data will be used for similarity search. If specified,
+      the other parameters will be ignored.
+      """
+      reportId: ID
+
+      """
+      The message content.
+      """
+      content: String
+    ): [Topic!]!
   }
 
   extend type Mutation {
