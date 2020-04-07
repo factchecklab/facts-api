@@ -86,9 +86,8 @@ export default {
     },
 
     removeReportsFromTopic: async (parent, { input }, { models }) => {
-      const { reportIds, topicId } = input;
+      const { reportIds } = input;
 
-      const topic = await models.Topic.findByPk(topicId);
       const reports = await models.Report.findAll({ where: { id: reportIds } });
       // TODO(cheungpat): Ensure all requested reports are found.
       reports.forEach((report) => {

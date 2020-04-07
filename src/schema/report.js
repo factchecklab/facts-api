@@ -78,7 +78,6 @@ export default gql`
 
   input RemoveReportsFromTopicInput {
     reportIds: [ID!]!
-    topicId: ID!
   }
 
   type RemoveReportsFromTopicPayload {
