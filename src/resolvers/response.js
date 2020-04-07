@@ -18,7 +18,7 @@ export default {
 
         const response = models.Response.build({
           type: 'response',
-          published: false,
+          published: true, // FIXME(cheungpat): Change to default unpublished
           conclusion: 'uncertain',
           content: '',
           ...rest,
