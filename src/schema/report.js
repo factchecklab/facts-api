@@ -41,7 +41,18 @@ export default gql`
     createReport(input: CreateReportInput!): CreateReportPayload!
     closeReports(input: CloseReportsInput!): CloseReportsPayload!
     reopenReports(input: ReopenReportsInput!): ReopenReportsPayload!
+
+    """
+    Matched topic with the specified reports.
+    """
     addReportsToTopic(input: AddReportsToTopicInput!): AddReportsToTopicPayload!
+
+    """
+    Remove the matched topic from the specified reports.
+    """
+    removeReportsFromTopic(
+      input: RemoveReportsFromTopicInput!
+    ): RemoveReportsFromTopicPayload!
   }
 
   type Report {
@@ -93,6 +104,14 @@ export default gql`
   }
 
   type AddReportsToTopicPayload {
+    _: Boolean
+  }
+
+  input RemoveReportsFromTopicInput {
+    reportIds: [ID!]!
+  }
+
+  type RemoveReportsFromTopicPayload {
     _: Boolean
   }
 `;
