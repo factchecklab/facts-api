@@ -84,6 +84,24 @@ export default {
       );
       return {};
     },
+
+    removeReportsFromTopic: async (parent, { input }, { models }) => {
+      const { reportIds, topicId } = input;
+
+      const topic = await models.Topic.findByPk(topicId);
+      const reports = await models.Report.findAll({ where: { id: reportIds } });
+      // TODO(cheungpat): Ensure all requested reports are found.
+      reports.forEach((report) => {
+        report.setTopic(null);
+        report.closed = false;
+      });
+      await Promise.all(
+        reports.map((report) => {
+          return report.save();
+        })
+      );
+      return {};
+    },
   },
 
   Report: {
