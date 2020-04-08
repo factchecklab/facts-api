@@ -50,6 +50,36 @@ export default gql`
     content: String
   }
 
+  """
+  Input for a response in CreateTopic.
+  """
+  input CreateTopicResponseInput {
+    """
+    Content of the response.
+    """
+    content: String
+
+    """
+    Type of the response.
+    """
+    type: ResponseType
+
+    """
+    Published state of the response.
+    """
+    published: Boolean
+
+    """
+    Conclusion of the response.
+    """
+    conclusion: Conclusion
+
+    """
+    ID of the entity of the response.
+    """
+    entityId: ID!
+  }
+
   input CreateTopicInput {
     reportId: ID
     title: String
@@ -57,10 +87,51 @@ export default gql`
     published: Boolean! = false
     conclusion: Conclusion! = uncertain
     message: TopicMessageInput
+
+    """
+    A list of responses to be created.
+    """
+    responses: [CreateTopicResponseInput!]!
   }
 
   type CreateTopicPayload {
     topic: Topic!
+  }
+
+  """
+  Input for a response in UpdateTopic.
+  """
+  input UpdateTopicResponseInput {
+    """
+    ID of the response to be modified. If no ID is specified, a new response
+    will be created.
+    """
+    id: ID
+
+    """
+    Content of the response.
+    """
+    content: String
+
+    """
+    Type of the response.
+    """
+    type: ResponseType
+
+    """
+    Published state of the response.
+    """
+    published: Boolean
+
+    """
+    Conclusion of the response.
+    """
+    conclusion: Conclusion
+
+    """
+    ID of the entity of the response.
+    """
+    entityId: ID
   }
 
   input UpdateTopicInput {
@@ -70,6 +141,12 @@ export default gql`
     published: Boolean
     conclusion: Conclusion
     message: TopicMessageInput
+
+    """
+    A list of responses to be saved. Any existing response not included
+    in this list will be removed from this topic.
+    """
+    responses: [UpdateTopicResponseInput!]
   }
 
   type UpdateTopicPayload {

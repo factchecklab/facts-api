@@ -1,5 +1,66 @@
+import { ValidationError } from 'apollo-server-koa';
 import { Op } from 'sequelize';
 import { NotFound } from './errors';
+
+const modifyResponses = async (topic, responsePayloads, models, opts) => {
+  const existingResponses = await topic.getResponses(opts);
+  await Promise.all(
+    responsePayloads.map((response) => {
+      return (async () => {
+        const { id, entityId, ...rest } = response;
+
+        if (entityId) {
+          const entity = await models.Entity.findByPk(entityId, opts);
+          if (!entity) {
+            throw new NotFound(
+              `Could not find an Entity with the id '${entityId}'`
+            );
+          }
+        } else if (!id) {
+          throw new ValidationError(
+            `To create a response, an entity ID must be specified.`
+          );
+        }
+
+        if (id) {
+          const index = existingResponses.findIndex((r) => {
+            return r.id === parseInt(id);
+          });
+          if (index < 0) {
+            throw new NotFound(
+              `Could not find a Response with the id '${id} for topic with the id ${topic.id}'`
+            );
+          }
+          const existingResponse = existingResponses[index];
+          existingResponses.splice(index, 1);
+
+          await existingResponse.update(
+            { ...rest, entityID: entityId || exisitngResponse.entityId },
+            { ...opts }
+          );
+        } else {
+          const response = models.Response.build({
+            type: 'response',
+            published: true, // FIXME(cheungpat): Change to default unpublished
+            conclusion: 'uncertain',
+            content: '',
+            ...rest,
+            entityId: entityId,
+            topicId: topic.id,
+          });
+          await response.save({ ...opts });
+        }
+      })();
+    })
+  );
+
+  // Delete unreferenced responses
+  await Promise.all(
+    existingResponses.map((response) => {
+      return response.destroy({ ...opts });
+    })
+  );
+};
 
 export default {
   Query: {
@@ -64,10 +125,11 @@ export default {
 
   Mutation: {
     createTopic: (parent, { input }, { sequelize, models }) => {
-      const { reportId, message, ...rest } = input;
+      const { reportId, message, responses, ...rest } = input;
 
       return sequelize.transaction(async (t) => {
         const opts = { transaction: t };
+        // If a reportId is specified, find the report
         let report = null;
         if (reportId) {
           report = await models.Report.findByPk(reportId, opts);
@@ -78,9 +140,10 @@ export default {
           }
         }
 
+        // Create a new topic
         const messageContent =
           (report && report.content) || (message && message.content) || '';
-        const topic = models.Topic.build(
+        let topic = models.Topic.build(
           {
             title: '',
             published: true, // FIXME(cheungpat): Change to default unpublished
@@ -91,23 +154,23 @@ export default {
           { include: ['message'] }
         );
 
-        const savedTopic = await topic.save({ ...opts, returning: true });
-        if (report) {
-          await savedTopic.addReport(report, opts);
-        }
+        topic = await topic.save({ ...opts, returning: true });
 
-        return { topic: savedTopic };
+        // Save all accompanying responses
+        await modifyResponses(topic, responses, models, opts);
+
+        return { topic };
       });
     },
 
     updateTopic: (parent, { input }, { models, sequelize }) => {
-      const { id, message, ...rest } = input;
+      const { id, message, responses, ...rest } = input;
       const messageContent = (message && message.content) || undefined;
 
       return sequelize.transaction(async (t) => {
         const opts = { transaction: t };
 
-        const topic = await models.Topic.findByPk(id, opts);
+        let topic = await models.Topic.findByPk(id, opts);
         if (!topic) {
           throw new NotFound(`Could not find a Topic with the id '${id}'`);
         }
@@ -115,9 +178,12 @@ export default {
         if (messageContent !== undefined) {
           await message.update({ content: messageContent }, opts);
         }
-        return {
-          topic: await topic.update(rest, { ...opts, returning: true }),
-        };
+        topic = await topic.update(rest, { ...opts, returning: true });
+
+        // Save all accompanying responses
+        await modifyResponses(topic, responses, models, opts);
+
+        return { topic };
       });
     },
 
