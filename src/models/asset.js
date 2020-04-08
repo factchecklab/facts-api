@@ -5,11 +5,16 @@ export default (sequelize, DataTypes) => {
 
   Asset.init(
     {
-      mimetype: {
+      contentType: {
+        field: 'content_type',
         type: DataTypes.TEXT,
         allowNull: false,
       },
       path: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      filename: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
