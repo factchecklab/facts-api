@@ -1,6 +1,6 @@
 const indexName = 'reports';
 
-const save = async (client, report) => {
+const save = async (client, report, options) => {
   const {
     id,
     documentId,
@@ -29,7 +29,7 @@ const save = async (client, report) => {
   });
 };
 
-const remove = async (client, { documentId }) => {
+const remove = async (client, { documentId }, options) => {
   await client.delete({
     index: indexName,
     id: documentId,
@@ -108,14 +108,25 @@ const searchSimilarByContent = async (
 };
 
 const addHooks = ({ Report }, client) => {
-  Report.addHook('afterCreate', async (report, options) => {
-    await save(client, report);
-  });
-  Report.addHook('afterUpdate', async (report, options) => {
-    await save(client, report);
+  Report.addHook('afterSave', async (report, options) => {
+    try {
+      await save(client, report, options);
+    } catch (error) {
+      console.error(
+        `Error occurred while indexing Report with ID ${report.id}:`,
+        error
+      );
+    }
   });
   Report.addHook('afterDestroy', async (report, options) => {
-    await remove(client, report);
+    try {
+      await remove(client, report, options);
+    } catch (error) {
+      console.error(
+        `Error occurred while removing index for Report with ID ${report.id}:`,
+        error
+      );
+    }
   });
 };
 
