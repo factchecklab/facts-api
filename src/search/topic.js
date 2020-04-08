@@ -1,6 +1,6 @@
 const indexName = 'topics';
 
-const save = async (client, topic) => {
+const save = async (client, topic, options) => {
   const {
     id,
     documentId,
@@ -11,8 +11,8 @@ const save = async (client, topic) => {
     updatedAt,
   } = topic;
 
-  const message = await topic.getMessage();
-  const responses = await topic.getResponses();
+  const message = await topic.getMessage(options);
+  const responses = await topic.getResponses(options);
   await client.index({
     index: indexName,
     id: documentId,
@@ -35,7 +35,7 @@ const save = async (client, topic) => {
   });
 };
 
-const remove = async (client, { documentId }) => {
+const remove = async (client, { documentId }, options) => {
   await client.delete({
     index: indexName,
     id: documentId,
@@ -106,14 +106,25 @@ const searchSimilarByMessageContent = async (
 };
 
 const addHooks = ({ Topic }, client) => {
-  Topic.addHook('afterCreate', async (topic, options) => {
-    await save(client, topic);
-  });
-  Topic.addHook('afterUpdate', async (topic, options) => {
-    await save(client, topic);
+  Topic.addHook('afterSave', async (topic, options) => {
+    try {
+      await save(client, topic, options);
+    } catch (error) {
+      console.error(
+        `Error occurred while indexing Topic with ID ${topic.id}:`,
+        error
+      );
+    }
   });
   Topic.addHook('afterDestroy', async (topic, options) => {
-    await remove(client, topic);
+    try {
+      await remove(client, topic, ooptions);
+    } catch (error) {
+      console.error(
+        `Error occurred while removing index for Topic with ID ${topic.id}:`,
+        error
+      );
+    }
   });
 };
 
