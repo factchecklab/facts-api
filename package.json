@@ -18,11 +18,13 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.6.1",
+    "@google-cloud/storage": "^4.7.0",
     "apollo-server": "^2.11.0",
     "apollo-server-koa": "^2.11.0",
     "dataloader": "^2.0.0",
     "dotenv": "^8.2.0",
     "graphql": "^14.6.0",
+    "mime-types": "^2.1.26",
     "pg": "^8.0.0",
     "sequelize": "^5.21.5",
     "uuid": "^7.0.3"

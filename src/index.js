@@ -4,6 +4,7 @@ import models, { sequelize } from './models';
 import schema from './schema';
 import resolvers from './resolvers';
 import search, { client as elastic, addHooks } from './search';
+import storage from './storage';
 
 sequelize.sync();
 
@@ -19,6 +20,7 @@ const server = new ApolloServer({
       sequelize,
       elastic,
       search,
+      storage,
     };
   },
   resolvers,
