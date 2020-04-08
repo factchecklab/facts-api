@@ -157,7 +157,9 @@ export default {
         topic = await topic.save({ ...opts, returning: true });
 
         // Save all accompanying responses
-        await modifyResponses(topic, responses, models, opts);
+        if (responses) {
+          await modifyResponses(topic, responses, models, opts);
+        }
 
         return { topic };
       });
@@ -181,7 +183,13 @@ export default {
         topic = await topic.update(rest, { ...opts, returning: true });
 
         // Save all accompanying responses
-        await modifyResponses(topic, responses, models, opts);
+        if (responses) {
+          // If array is specified, `responses` is truthy, and all existing
+          // responses will be destroyed.
+          // It no array is specified, this block is not executed and no
+          // respones will be modified.
+          await modifyResponses(topic, responses, models, opts);
+        }
 
         return { topic };
       });
