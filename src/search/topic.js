@@ -21,9 +21,11 @@ const save = async (client, topic) => {
       title,
       published,
       conclusion,
-      message: {
-        content: message.content,
-      },
+      message: message
+        ? {
+            content: message.content,
+          }
+        : null,
       responses: responses.map((response) => {
         const { type, content, published, conclusion } = response;
         return { type, content, published, conclusion };
