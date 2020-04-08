@@ -41,11 +41,26 @@ module.exports = {
         },
         { transaction: t }
       );
+      await queryInterface.addColumn(
+        'topics',
+        'cover_image_asset_id',
+        {
+          type: Sequelize.INTEGER,
+          references: {
+            model: 'assets',
+            key: 'id',
+          },
+        },
+        { transaction: t }
+      );
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.removeColumn('topics', 'cover_image_asset_id', {
+        transaction: t,
+      });
       await queryInterface.removeColumn('assets', 'filename', {
         transaction: t,
       });

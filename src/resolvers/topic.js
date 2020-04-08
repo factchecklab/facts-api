@@ -213,5 +213,9 @@ export default {
     reports: (topic, args, { models }) => {
       return topic.getReports();
     },
+
+    coverImage: (topic, args, { models }) => {
+      return topic.getCoverImage();
+    },
   },
 };
