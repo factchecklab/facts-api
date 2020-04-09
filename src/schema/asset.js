@@ -1,8 +1,14 @@
 import gql from 'graphql-tag';
 
 export default gql`
+  extend type Mutation {
+    uploadAsset(file: Upload!): Asset!
+  }
+
   type Asset {
     id: ID!
-    mimetype: String!
+    contentType: String!
+    filename: String!
+    url: String!
   }
 `;

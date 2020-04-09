@@ -69,6 +69,14 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
       },
     });
+
+    Topic.belongsTo(models.Asset, {
+      as: 'coverImage',
+      foreignKey: {
+        name: 'coverImageAssetId',
+        field: 'cover_image_asset_id',
+      },
+    });
   };
 
   return Topic;

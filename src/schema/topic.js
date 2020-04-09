@@ -40,6 +40,11 @@ export default gql`
     published: Boolean!
     conclusion: Conclusion!
     message: Message!
+
+    """
+    Cover image for the topic.
+    """
+    coverImage: Asset
     responses: [Response!]!
     reports: [Report!]!
     createdAt: Date!
@@ -92,6 +97,11 @@ export default gql`
     A list of responses to be created.
     """
     responses: [CreateTopicResponseInput!]!
+
+    """
+    ID of the asset for the cover image.
+    """
+    coverImageAssetId: ID
   }
 
   type CreateTopicPayload {
@@ -147,6 +157,11 @@ export default gql`
     in this list will be removed from this topic.
     """
     responses: [UpdateTopicResponseInput!]
+
+    """
+    ID of the asset for the cover image.
+    """
+    coverImageAssetId: ID
   }
 
   type UpdateTopicPayload {
