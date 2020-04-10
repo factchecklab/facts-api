@@ -76,6 +76,7 @@ export default gql`
     content: String!
     source: String!
     url: String
+    attachments: [AttachmentInput!]
   }
 
   type CreateReportPayload {
