@@ -24,6 +24,7 @@
     "dataloader": "^2.0.0",
     "dotenv": "^8.2.0",
     "graphql": "^14.6.0",
+    "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.26",
     "pg": "^8.0.0",
     "sequelize": "^5.21.5",

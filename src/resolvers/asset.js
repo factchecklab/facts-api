@@ -1,8 +1,11 @@
 import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { NotFound } from './errors';
+import { ValidationError } from 'apollo-server-koa';
+import { generate as generateAssetToken } from '../util/asset-token';
 
-export const generateAssetUrl = async (asset, { storage }) => {
+export const generateAssetUrl = async (asset, options, { storage }) => {
   const bucket = storage.bucket(process.env.ASSETS_STORAGE_BUCKET);
   const file = bucket.file(asset.path);
 
@@ -16,6 +19,7 @@ export const generateAssetUrl = async (asset, { storage }) => {
   const result = await file.getSignedUrl({
     action: 'read',
     expires,
+    ...(options || {}),
   });
   return result.length > 0 ? result[0] : 1;
 };
@@ -61,7 +65,22 @@ export default {
 
   Asset: {
     url: (asset, args, context) => {
-      return generateAssetUrl(asset, context);
+      return generateAssetUrl(asset, {}, context);
+    },
+    downloadUrl: (asset, args, context) => {
+      return generateAssetUrl(asset, { promptSaveAs: asset.filename }, context);
+    },
+  },
+
+  UploadedAsset: {
+    url: (asset, args, context) => {
+      return generateAssetUrl(asset, {}, context);
+    },
+    downloadUrl: (asset, args, context) => {
+      return generateAssetUrl(asset, { promptSaveAs: asset.filename }, context);
+    },
+    token: (asset, args, context) => {
+      return generateAssetToken(asset.id);
     },
   },
 };

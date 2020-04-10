@@ -10,6 +10,8 @@ import report from './report';
 
 const link = gql`
   scalar Date
+  scalar AssetToken
+  scalar URL
 
   enum Conclusion {
     truthy
