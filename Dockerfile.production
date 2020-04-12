@@ -1,0 +1,22 @@
+FROM node:12-slim AS build
+
+WORKDIR /usr/src/app
+
+COPY package.json yarn.lock ./
+RUN yarn install
+
+COPY . .
+RUN yarn build
+
+FROM node:12-slim AS final
+
+WORKDIR /usr/src/app
+
+COPY package.json yarn.lock ./
+RUN yarn install --production
+
+COPY --from=build /usr/src/app/dist /usr/src/app/dist
+
+ENV HOST=0.0.0.0 PORT=4000
+EXPOSE 4000
+CMD [ "yarn", "start" ]

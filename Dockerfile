@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:12-slim
 
 WORKDIR /usr/src/app
 
@@ -9,4 +9,4 @@ COPY . .
 
 ENV HOST=0.0.0.0 PORT=4000
 EXPOSE 4000
-CMD [ "yarn", "start" ]
+CMD [ "yarn", "dev" ]

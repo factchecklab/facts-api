@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - deploy
 
 test:
   stage: test
@@ -35,14 +36,62 @@ audit:
     paths:
       - node_modules/
 
-build:
+build_image:
   image: docker:19.03.1
   stage: build
+  only:
+    - branches
   services:
     - docker:19.03.1-dind
   variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  script:
+    BUILD_IMAGE_TAG: $CI_REGISTRY_IMAGE:build-$CI_COMMIT_REF_SLUG
+    FINAL_IMAGE_TAG: $CI_REGISTRY_IMAGE:final-$CI_COMMIT_REF_SLUG
+    GCR_IMAGE_TAG: $GCR_IMAGE:git-$CI_COMMIT_SHORT_SHA
+    GITLAB_IMAGE_TAG: $CI_REGISTRY_IMAGE:git-$CI_COMMIT_SHORT_SHA
+    DOCKER_BUILDKIT: 1
+  before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $IMAGE_TAG .
-    - docker push $IMAGE_TAG
+    - docker login -u _json_key --password-stdin $GCR_REGISTRY < "$GOOGLE_SERVICE_ACCOUNT_CREDENTIALS"
+  script:
+    - |
+      docker build -t $BUILD_IMAGE_TAG -f Dockerfile.production \
+        --cache-from node:12-slim \
+        --cache-from $CI_REGISTRY_IMAGE:build-master \
+        --cache-from $BUILD_IMAGE_TAG \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --target build \
+        .
+    - |
+      docker build -t $FINAL_IMAGE_TAG -f Dockerfile.production \
+        --cache-from node:12-slim \
+        --cache-from $BUILD_IMAGE_TAG \
+        --cache-from $CI_REGISTRY_IMAGE:final-master \
+        --cache-from $FINAL_IMAGE_TAG \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --target final \
+        .
+    - docker push $BUILD_IMAGE_TAG
+    - docker push $FINAL_IMAGE_TAG
+    - docker tag $FINAL_IMAGE_TAG $GITLAB_IMAGE_TAG
+    - docker push $GITLAB_IMAGE_TAG
+    - docker tag $FINAL_IMAGE_TAG $GCR_IMAGE_TAG
+    - docker push $GCR_IMAGE_TAG
+
+deploy:
+  image: google/cloud-sdk:alpine
+  stage: deploy
+  only:
+    - master
+  when: manual
+  environment: master
+  variables:
+    GCR_IMAGE_TAG: $GCR_IMAGE:git-$CI_COMMIT_SHORT_SHA
+  before_script:
+    - gcloud auth activate-service-account --key-file "$GOOGLE_SERVICE_ACCOUNT_CREDENTIALS"
+  script:
+    - |
+      gcloud run deploy $GCLOUD_RUN_SERVICE_NAME \
+        --image $GCR_IMAGE_TAG \
+        --region $GCLOUD_RUN_REGION \
+        --platform managed \
+        --project $GCLOUD_PROJECT_ID
