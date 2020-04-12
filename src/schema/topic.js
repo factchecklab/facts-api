@@ -4,7 +4,7 @@ export default gql`
   extend type Query {
     topics(
       keyword: String
-      closed: Boolean = false
+      includeUnpublished: Boolean = false
       offset: Int = 0
       limit: Int = 20
     ): [Topic!]!
@@ -45,7 +45,7 @@ export default gql`
     Cover image for the topic.
     """
     coverImage: Asset
-    responses: [Response!]!
+    responses(includeUnpublished: Boolean = false): [Response!]!
     reports: [Report!]!
     createdAt: Date!
     updatedAt: Date!

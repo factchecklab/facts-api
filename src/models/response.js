@@ -27,6 +27,11 @@ export default (sequelize, DataTypes) => {
       sequelize,
       modelName: 'response',
       paranoid: true,
+      defaultScope: {
+        where: {
+          published: true,
+        },
+      },
     }
   );
 
