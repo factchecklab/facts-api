@@ -33,7 +33,10 @@ export default (sequelize, DataTypes) => {
   Attachment.associate = (models) => {
     Attachment.belongsTo(models.Asset, {
       as: 'asset',
-      foreignKey: 'assetId',
+      foreignKey: {
+        name: 'assetId',
+        field: 'asset_id',
+      },
     });
   };
 
