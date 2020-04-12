@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "babel-node src/index.js",
+    "start": "NODE_ENV=production node dist/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
     "build": "babel src --out-dir dist",
     "migrate": "sequelize db:migrate",

@@ -9,9 +9,6 @@
 
 Or you can use `docker-compose up`. The API is available on port 4000.
 
-Currently, the server creates database schema upon server starts. But it is
-recommended that you run database schema migration.
-
 To seed data, run `yarn seed:demo`, then `yarn reindex`.
 
 ## TODOs

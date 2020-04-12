@@ -6,8 +6,6 @@ import resolvers from './resolvers';
 import search, { client as elastic, addHooks } from './search';
 import storage from './storage';
 
-sequelize.sync();
-
 addHooks(models);
 
 // The ApolloServer constructor requires two parameters: your schema
