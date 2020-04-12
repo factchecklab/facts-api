@@ -5,6 +5,7 @@ import schema from './schema';
 import resolvers from './resolvers';
 import search, { client as elastic, addHooks } from './search';
 import storage from './storage';
+import directives from './directives';
 
 addHooks(models);
 
@@ -22,6 +23,8 @@ const server = new ApolloServer({
     };
   },
   resolvers,
+  schemaDirectives: directives,
+  introspection: true,
 });
 
 // The `listen` method launches a web server.

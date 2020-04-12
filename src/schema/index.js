@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 
+import directives from './directives';
 import pagination from './pagination';
 import entity from './entity';
 import topic from './topic';
@@ -40,6 +41,7 @@ const link = gql`
 
 export default [
   link,
+  directives,
   pagination,
   entity,
   topic,

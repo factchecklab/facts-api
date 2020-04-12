@@ -4,12 +4,11 @@ export default gql`
   extend type Query {
     socialPosts(
       keywords: String
-      orderBy: SocialPostOrderField
+      orderBy: SocialPostOrderField @stub
       reverse: Boolean
       after: Cursor
-      first: Int
       before: Cursor
-      last: Int
+      first: Int
     ): SocialPostConnection!
   }
 
@@ -75,7 +74,7 @@ export default gql`
     The group in which the post is posted in. Can be null if group does not
     apply for this social post.
     """
-    group: SocialGroup
+    group: SocialGroup @stub
 
     """
     The title of the social post.
@@ -90,21 +89,21 @@ export default gql`
     """
     The multiplier showing relative trend of this post relative to other post.
     """
-    performance: Float
+    performance: Float @stub
 
     """
     Comment count. If the platform does not support reaction, this can be null.
     """
-    reactionCount: Int
+    reactionCount: Int @stub
 
     """
     Comment count. If the platform does not support comment, this can be null.
     """
-    commentCount: Int
+    commentCount: Int @stub
 
     """
     Share count. If the platform does not support sharing, this can be null.
     """
-    shareCount: Int
+    shareCount: Int @stub
   }
 `;
