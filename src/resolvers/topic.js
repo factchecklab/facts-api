@@ -41,7 +41,6 @@ const modifyResponses = async (topic, responsePayloads, models, opts) => {
         } else {
           const response = models.Response.build({
             type: 'response',
-            published: true, // FIXME(cheungpat): Change to default unpublished
             conclusion: 'uncertain',
             content: '',
             ...rest,
@@ -66,12 +65,14 @@ export default {
   Query: {
     topics: async (
       parent,
-      { keyword, offset, limit },
+      { keyword, includeUnpublished, offset, limit },
       { models, search, elastic }
     ) => {
-      const where = {
-        published: true,
-      };
+      let { Topic } = models;
+      if (includeUnpublished) {
+        Topic = Topic.unscoped();
+      }
+
       if (keyword) {
         const ids = await search.Topic.searchByKeyword(
           elastic,
@@ -79,12 +80,9 @@ export default {
           offset,
           limit
         );
-        return models.Topic.findAllByDocumentIds(ids, {
-          where,
-        });
+        return Topic.findAllByDocumentIds(ids);
       } else {
-        return models.Topic.findAll({
-          where,
+        return Topic.findAll({
           offset: offset || 0,
           limit: Math.min(limit || 20, 100),
           order: [['createdAt', 'desc']],
@@ -93,7 +91,8 @@ export default {
     },
 
     topic: (parent, { id }, { models }) => {
-      return models.Topic.findByPk(id);
+      const { Topic } = models;
+      return Topic.findByPk(id);
     },
 
     similarTopics: async (
@@ -117,9 +116,7 @@ export default {
         offset,
         limit
       );
-      return models.Topic.findAllByDocumentIds(ids, {
-        where: { published: true },
-      });
+      return models.Topic.findAllByDocumentIds(ids);
     },
   },
 
@@ -146,7 +143,6 @@ export default {
         let topic = models.Topic.build(
           {
             title: '',
-            published: true, // FIXME(cheungpat): Change to default unpublished
             conclusion: 'uncertain',
             ...rest,
             message: { content: messageContent },
@@ -214,8 +210,13 @@ export default {
       return topic.getMessage();
     },
 
-    responses: (topic, args, { models }) => {
-      return topic.getResponses();
+    responses: (topic, { includeUnpublished }, { models }) => {
+      let { Response } = models;
+      if (includeUnpublished) {
+        Response = Response.unscoped();
+      }
+
+      return Response.findAll({ topicId: topic.id });
     },
 
     reports: (topic, args, { models }) => {

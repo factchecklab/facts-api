@@ -47,6 +47,11 @@ export default (sequelize, DataTypes) => {
       sequelize,
       modelName: 'topic',
       paranoid: true,
+      defaultScope: {
+        where: {
+          published: true,
+        },
+      },
     }
   );
 

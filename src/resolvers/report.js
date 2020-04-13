@@ -151,9 +151,7 @@ export default {
         elastic,
         report.content
       );
-      return models.Topic.findAllByDocumentIds(ids, {
-        where: { published: true },
-      });
+      return models.Topic.findAllByDocumentIds(ids);
     },
   },
 };
