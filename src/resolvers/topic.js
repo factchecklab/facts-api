@@ -7,7 +7,7 @@ import {
 } from '../util/asset-token';
 
 const modifyResponses = async (topic, responsePayloads, models, opts) => {
-  const existingResponses = await topic.getResponses(opts);
+  const existingResponses = await topic.getResponses({ ...opts, scope: null });
   await Promise.all(
     responsePayloads.map((response) => {
       return (async () => {
@@ -32,7 +32,7 @@ const modifyResponses = async (topic, responsePayloads, models, opts) => {
           });
           if (index < 0) {
             throw new NotFound(
-              `Could not find a Response with the id '${id} for topic with the id ${topic.id}'`
+              `Could not find a Response with the id ${id} for topic with the id ${topic.id}'`
             );
           }
           const existingResponse = existingResponses[index];
@@ -245,10 +245,10 @@ export default {
     responses: (topic, { includeUnpublished }, { models }) => {
       let { Response } = models;
       if (includeUnpublished) {
-        Response = Response.unscoped();
+        return topic.getResponses({ scope: null });
+      } else {
+        return topic.getResponses();
       }
-
-      return Response.findAll({ topicId: topic.id });
     },
 
     reports: (topic, args, { models }) => {
