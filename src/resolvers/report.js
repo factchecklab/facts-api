@@ -1,5 +1,10 @@
 import { Op } from 'sequelize';
 import { NotFound } from './errors';
+import {
+  verify as verifyAssetToken,
+  AssetTokenError,
+} from '../util/asset-token';
+import { ValidationError } from 'apollo-server-koa';
 
 export default {
   Query: {
@@ -61,11 +66,43 @@ export default {
   },
 
   Mutation: {
-    createReport: async (parent, { input }, { models }) => {
-      const { content, source, url } = input;
+    createReport: async (parent, { input }, context) => {
+      const { models } = context;
+      const { content, source, url, attachments: attachmentInputs } = input;
 
-      const report = models.Report.build({ content, source, url });
-      await report.save();
+      const attachments = await Promise.all(
+        (attachmentInputs || []).map((attachmentInput) => {
+          return (async () => {
+            const { type, location, assetId, assetToken } = attachmentInput;
+            if (type === 'url') {
+              return {
+                type,
+                location,
+              };
+            } else if (type === 'asset') {
+              try {
+                return {
+                  type,
+                  assetId: await verifyAssetToken(assetToken),
+                };
+              } catch (error) {
+                if (error instanceof AssetTokenError) {
+                  throw new ValidationError(error.toString());
+                }
+                throw error;
+              }
+            } else {
+              throw new Error(`Unexpected attachment type ${type}.`);
+            }
+          })();
+        })
+      );
+
+      const report = models.Report.build(
+        { content, source, url, attachments },
+        { include: ['attachments'] }
+      );
+      await report.save({ returning: true });
       return { report };
     },
 

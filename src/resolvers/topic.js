@@ -1,6 +1,10 @@
 import { ValidationError } from 'apollo-server-koa';
 import { Op } from 'sequelize';
 import { NotFound } from './errors';
+import {
+  verify as verifyAssetToken,
+  AssetTokenError,
+} from '../util/asset-token';
 
 const modifyResponses = async (topic, responsePayloads, models, opts) => {
   const existingResponses = await topic.getResponses(opts);
@@ -122,7 +126,7 @@ export default {
 
   Mutation: {
     createTopic: (parent, { input }, { sequelize, models }) => {
-      const { reportId, message, responses, ...rest } = input;
+      const { reportId, message, responses, coverImage, ...rest } = input;
 
       return sequelize.transaction(async (t) => {
         const opts = { transaction: t };
@@ -140,6 +144,18 @@ export default {
         // Create a new topic
         const messageContent =
           (report && report.content) || (message && message.content) || '';
+
+        if (coverImage) {
+          try {
+            rest.coverImageAssetId = await verifyAssetToken(coverImage.token);
+          } catch (error) {
+            if (error instanceof AssetTokenError) {
+              throw new ValidationError(error.toString());
+            }
+            throw error;
+          }
+        }
+
         let topic = models.Topic.build(
           {
             title: '',
@@ -161,8 +177,9 @@ export default {
       });
     },
 
-    updateTopic: (parent, { input }, { models, sequelize }) => {
-      const { id, message, responses, ...rest } = input;
+    updateTopic: (parent, { input }, context) => {
+      const { models, sequelize } = context;
+      const { id, message, responses, coverImage, ...rest } = input;
       const messageContent = (message && message.content) || undefined;
 
       return sequelize.transaction(async (t) => {
@@ -172,10 +189,25 @@ export default {
         if (!topic) {
           throw new NotFound(`Could not find a Topic with the id '${id}'`);
         }
+
         const message = await topic.getMessage(opts);
         if (messageContent !== undefined) {
           await message.update({ content: messageContent }, opts);
         }
+
+        if (coverImage && parseInt(coverImage.id) !== topic.coverImageAssetId) {
+          try {
+            rest.coverImageAssetId = await verifyAssetToken(coverImage.token);
+          } catch (error) {
+            if (error instanceof AssetTokenError) {
+              throw new ValidationError(error.toString());
+            }
+            throw error;
+          }
+        } else if (coverImage === null) {
+          rest.coverImageAssetId = null;
+        }
+
         topic = await topic.update(rest, { ...opts, returning: true });
 
         // Save all accompanying responses

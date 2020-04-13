@@ -99,9 +99,9 @@ export default gql`
     responses: [CreateTopicResponseInput!]!
 
     """
-    ID of the asset for the cover image.
+    The cover image input.
     """
-    coverImageAssetId: ID
+    coverImage: AssetInput
   }
 
   type CreateTopicPayload {
@@ -159,9 +159,9 @@ export default gql`
     responses: [UpdateTopicResponseInput!]
 
     """
-    ID of the asset for the cover image.
+    The cover image input.
     """
-    coverImageAssetId: ID
+    coverImage: AssetInput
   }
 
   type UpdateTopicPayload {

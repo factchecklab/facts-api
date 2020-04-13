@@ -67,7 +67,7 @@ export default {
       return response.getTopic();
     },
     attachments: (response, args, { models }) => {
-      return responses.getAttachments();
+      return response.getAttachments();
     },
   },
 };
