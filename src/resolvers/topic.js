@@ -94,9 +94,14 @@ export default {
       }
     },
 
-    topic: (parent, { id }, { models }) => {
+    topic: async (parent, { id }, { models }) => {
       const { Topic } = models;
-      return Topic.findByPk(id);
+      // TODO(cheungpat): Check published status if logged in
+      const topic = await Topic.unscoped().findByPk(id);
+      if (!topic) {
+        throw new NotFound(`Could not find a Topic with the id '${id}'`);
+      }
+      return topic;
     },
 
     similarTopics: async (
