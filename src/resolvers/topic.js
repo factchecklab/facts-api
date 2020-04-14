@@ -39,7 +39,7 @@ const modifyResponses = async (topic, responsePayloads, models, opts) => {
           existingResponses.splice(index, 1);
 
           await existingResponse.update(
-            { ...rest, entityID: entityId || exisitngResponse.entityId },
+            { ...rest, entityID: entityId || existingResponse.entityId },
             { ...opts }
           );
         } else {

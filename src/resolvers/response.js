@@ -1,3 +1,5 @@
+import { NotFound } from './errors';
+
 export default {
   Mutation: {
     createResponse: (parent, { input }, { sequelize, models }) => {

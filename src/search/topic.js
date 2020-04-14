@@ -120,7 +120,7 @@ const addHooks = ({ Topic }, client) => {
   });
   Topic.addHook('afterDestroy', async (topic, options) => {
     try {
-      await remove(client, topic, ooptions);
+      await remove(client, topic, options);
     } catch (error) {
       console.error(
         `Error occurred while removing index for Topic with ID ${topic.id}:`,

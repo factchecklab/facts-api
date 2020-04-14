@@ -2,7 +2,8 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true
+    node: true,
+    es6: true
   },
   parser: 'babel-eslint',
   parserOptions: {
@@ -10,6 +11,7 @@ module.exports = {
   extends: [
     'prettier',
     'plugin:prettier/recommended',
+    'eslint:recommended'
   ],
   plugins: [
     'prettier'
@@ -19,5 +21,6 @@ module.exports = {
     'camelcase': 'error',
     'no-return-await': 'error',
     'require-await': 'error',
+    'no-unused-vars': 'warn',
   }
 }

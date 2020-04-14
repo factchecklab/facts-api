@@ -41,7 +41,6 @@ export const verify = (token, expectedAssetId) => {
   return new Promise((resolve, reject) => {
     if (!token) {
       throw new AssetTokenError();
-      return;
     }
 
     jwt.verify(
