@@ -3,29 +3,31 @@ import Sequelize from 'sequelize';
 
 dotenv.config();
 
-let sequelize;
-if (process.env.DATABASE_URL) {
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    define: {
-      timestamps: true,
-      underscored: true,
-    },
-  });
-} else {
-  sequelize = new Sequelize(
-    process.env.TEST_DATABASE || process.env.DATABASE,
-    process.env.DATABASE_USER,
-    process.env.DATABASE_PASSWORD,
-    {
-      dialect: 'postgres',
-      define: {
-        timestamps: true,
-        underscored: true,
-      },
-    }
-  );
-}
+const sequelizeOptions = {
+  dialect: 'postgres',
+  define: {
+    timestamps: true,
+    underscored: true,
+  },
+};
+
+const sequelize = (() => {
+  if (process.env.DATABASE_URL) {
+    return new Sequelize(process.env.DATABASE_URL, sequelizeOptions);
+  } else {
+    // Specify the connection parameters using environment variables. A list
+    // is available at https://www.postgresql.org/docs/12/libpq-envars.html.
+    // Common options: PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE.
+    return new Sequelize({
+      ...sequelizeOptions,
+
+      // The following variables are ignored by node-postgres, hence we have
+      // to specify them here.
+      host: process.env.PGHOST,
+      port: process.env.PGPORT,
+    });
+  }
+})();
 
 const models = {
   Asset: sequelize.import('./asset'),
