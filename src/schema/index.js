@@ -7,6 +7,7 @@ import attachment from './attachment';
 import asset from './asset';
 import message from './message';
 import report from './report';
+import socialPostTrend from './social-post-trend';
 
 const link = gql`
   scalar Date
@@ -42,4 +43,5 @@ export default [
   asset,
   message,
   report,
+  socialPostTrend,
 ];
