@@ -31,12 +31,12 @@ const esSortObject = (orderBy, reverse) => {
   return sort;
 };
 
-const esQueryObject = (keywords) => {
-  return keywords
+const esQueryObject = (keyword) => {
+  return keyword
     ? {
         /* eslint-disable-next-line camelcase */
         multi_match: {
-          query: keywords,
+          query: keyword,
           fields: ['title', 'content'],
         },
       }
@@ -55,7 +55,7 @@ export default {
         index: 'threads',
         size: size + 1, // +1 to find out if more data is available
         body: {
-          query: esQueryObject(args.keywords),
+          query: esQueryObject(args.keyword),
           sort: esSortObject(args.orderBy, reverse),
           /* eslint-disable-next-line camelcase */
           search_after: afterCursor

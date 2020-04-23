@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 export default gql`
   extend type Query {
     socialPosts(
-      keywords: String
+      keyword: String
       orderBy: SocialPostOrderField @stub
       reverse: Boolean
       after: Cursor
