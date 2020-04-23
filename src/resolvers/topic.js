@@ -1,5 +1,4 @@
 import { ValidationError } from 'apollo-server-koa';
-import { Op } from 'sequelize';
 import { NotFound } from './errors';
 import {
   verify as verifyAssetToken,
@@ -94,9 +93,14 @@ export default {
       }
     },
 
-    topic: (parent, { id }, { models }) => {
+    topic: async (parent, { id }, { models }) => {
       const { Topic } = models;
-      return Topic.findByPk(id);
+      // TODO(cheungpat): Check published status if logged in
+      const topic = await Topic.unscoped().findByPk(id);
+      if (!topic) {
+        throw new NotFound(`Could not find a Topic with the id '${id}'`);
+      }
+      return topic;
     },
 
     similarTopics: async (
@@ -243,7 +247,6 @@ export default {
     },
 
     responses: (topic, { includeUnpublished }, { models }) => {
-      let { Response } = models;
       if (includeUnpublished) {
         return topic.getResponses({ scope: null });
       } else {
