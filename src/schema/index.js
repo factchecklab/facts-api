@@ -13,6 +13,7 @@ import socialPlatform from './social-platform';
 import socialGroup from './social-group';
 import socialPoster from './social-poster';
 import socialPost from './social-post';
+import socialPostTrend from './social-post-trend';
 
 const link = gql`
   scalar Date
@@ -54,4 +55,5 @@ export default [
   socialGroup,
   socialPoster,
   socialPost,
+  socialPostTrend,
 ];
