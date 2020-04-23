@@ -11,6 +11,7 @@ const getTokenSecret = () => {
       'Unable to verify asset token because of a configuration error.'
     );
   }
+  return secret;
 };
 
 export class AssetTokenError extends Error {
@@ -23,7 +24,7 @@ export const generate = (assetId) => {
   return new Promise((resolve, reject) => {
     jwt.sign(
       { assetId: parseInt(assetId) },
-      process.env.APPLICATION_SECRET,
+      getTokenSecret(),
       jwtOptions,
       (err, token) => {
         if (err) {
@@ -43,23 +44,18 @@ export const verify = (token, expectedAssetId) => {
       throw new AssetTokenError();
     }
 
-    jwt.verify(
-      token,
-      process.env.APPLICATION_SECRET,
-      jwtOptions,
-      (err, payload) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        if (expectedAssetId && parseInt(expectedAssetId) !== payload.assetId) {
-          reject(new AssetTokenError());
-          return;
-        }
-
-        resolve(payload.assetId);
+    jwt.verify(token, getTokenSecret(), jwtOptions, (err, payload) => {
+      if (err) {
+        reject(err);
+        return;
       }
-    );
+
+      if (expectedAssetId && parseInt(expectedAssetId) !== payload.assetId) {
+        reject(new AssetTokenError());
+        return;
+      }
+
+      resolve(payload.assetId);
+    });
   });
 };
