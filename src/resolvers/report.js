@@ -1,4 +1,3 @@
-import { Op } from 'sequelize';
 import { NotFound } from './errors';
 import {
   verify as verifyAssetToken,
@@ -73,7 +72,7 @@ export default {
       const attachments = await Promise.all(
         (attachmentInputs || []).map((attachmentInput) => {
           return (async () => {
-            const { type, location, assetId, assetToken } = attachmentInput;
+            const { type, location, assetToken } = attachmentInput;
             if (type === 'url') {
               return {
                 type,

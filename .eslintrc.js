@@ -21,6 +21,6 @@ module.exports = {
     'camelcase': 'error',
     'no-return-await': 'error',
     'require-await': 'error',
-    'no-unused-vars': 'warn',
+    'no-unused-vars': ['error', { "args": "none" }]
   }
 }

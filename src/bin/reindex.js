@@ -1,4 +1,4 @@
-import models, { sequelize } from '../models';
+import models from '../models';
 import hooks, { client } from '../search';
 
 const reindex = async () => {

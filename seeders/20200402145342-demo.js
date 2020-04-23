@@ -67,7 +67,7 @@ module.exports = {
         { returning: true }
       );
 
-      const responses = await queryInterface.bulkInsert(
+      await queryInterface.bulkInsert(
         'responses',
         [
           {
@@ -92,7 +92,7 @@ module.exports = {
         { returning: true }
       );
 
-      const reports = await queryInterface.bulkInsert(
+      await queryInterface.bulkInsert(
         'reports',
         [
           {

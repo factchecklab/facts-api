@@ -1,5 +1,4 @@
 import { ValidationError } from 'apollo-server-koa';
-import { Op } from 'sequelize';
 import { NotFound } from './errors';
 import {
   verify as verifyAssetToken,
@@ -248,7 +247,6 @@ export default {
     },
 
     responses: (topic, { includeUnpublished }, { models }) => {
-      let { Response } = models;
       if (includeUnpublished) {
         return topic.getResponses({ scope: null });
       } else {

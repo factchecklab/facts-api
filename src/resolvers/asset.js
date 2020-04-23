@@ -1,8 +1,6 @@
 import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { NotFound } from './errors';
-import { ValidationError } from 'apollo-server-koa';
 import { generate as generateAssetToken } from '../util/asset-token';
 
 export const generateAssetUrl = async (asset, options, { storage }) => {
