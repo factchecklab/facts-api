@@ -22,6 +22,5 @@ module.exports = {
     'no-return-await': 'error',
     'require-await': 'error',
     'no-unused-vars': 'warn',
-    'no-useless-escape': 'warn', // FIXME(cheungpat): set to warning for now
   }
 }
