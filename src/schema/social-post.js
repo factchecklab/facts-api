@@ -4,7 +4,7 @@ export default gql`
   extend type Query {
     socialPosts(
       keyword: String
-      orderBy: SocialPostOrderField @stub
+      orderBy: SocialPostOrderField
       reverse: Boolean
       after: Cursor
       before: Cursor
@@ -24,9 +24,9 @@ export default gql`
     reaction
 
     """
-    Order from high comment count to low comment count.
+    Order from high reply count to low reply count.
     """
-    comment
+    reply
 
     """
     Order from high share count to low share count.
@@ -54,7 +54,7 @@ export default gql`
   """
   Contains information of a social post.
   """
-  type SocialPost {
+  interface SocialPost {
     """
     The platform that is hosting the social post.
     """
@@ -63,12 +63,12 @@ export default gql`
     """
     The date and time the social post is posted.
     """
-    postedAt: Date!
+    createdAt: Date!
 
     """
     The original poster
     """
-    poster: SocialPoster
+    poster: SocialUser
 
     """
     The group in which the post is posted in. Can be null if group does not
@@ -89,21 +89,16 @@ export default gql`
     """
     The multiplier showing relative trend of this post relative to other post.
     """
-    performance: Float @stub
+    performance: Float
 
     """
-    Comment count. If the platform does not support reaction, this can be null.
+    The URL of the post on the social platform.
     """
-    reactionCount: Int @stub
+    platformUrl: URL
 
     """
-    Comment count. If the platform does not support comment, this can be null.
+    The ID of the social post on the social platform.
     """
-    commentCount: Int @stub
-
-    """
-    Share count. If the platform does not support sharing, this can be null.
-    """
-    shareCount: Int @stub
+    platformId: ID!
   }
 `;

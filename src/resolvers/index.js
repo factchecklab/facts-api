@@ -5,6 +5,7 @@ import response from './response';
 import attachment from './attachment';
 import asset from './asset';
 import socialPost from './social-post';
+import socialUser from './social-user';
 import socialPostTrend from './social-post-trend';
 
 export default [
@@ -15,5 +16,6 @@ export default [
   attachment,
   asset,
   socialPost,
+  socialUser,
   socialPostTrend,
 ];
