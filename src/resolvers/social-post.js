@@ -111,7 +111,7 @@ export default {
               name: 'lihkg',
             },
             poster: {
-              name: doc.author,
+              name: (doc.user && doc.user.name) || null,
             },
             group: doc.group && {
               platform: {
