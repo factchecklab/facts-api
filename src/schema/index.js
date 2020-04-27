@@ -11,9 +11,10 @@ import message from './message';
 import report from './report';
 import socialPlatform from './social-platform';
 import socialGroup from './social-group';
-import socialPoster from './social-poster';
+import socialUser from './social-user';
 import socialPost from './social-post';
 import socialPostTrend from './social-post-trend';
+import lihkg from './lihkg';
 
 const link = gql`
   scalar Date
@@ -53,7 +54,8 @@ export default [
   report,
   socialPlatform,
   socialGroup,
-  socialPoster,
+  socialUser,
   socialPost,
   socialPostTrend,
+  lihkg,
 ];

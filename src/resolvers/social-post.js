@@ -22,12 +22,41 @@ const esSortObject = (orderBy, reverse) => {
     },
   ];
 
-  // TODO(cheungpat): Implement other sorting. The following code sort by newest.
-  sort.unshift({
-    time: {
-      order: reverse ? 'asc' : 'desc',
-    },
-  });
+  switch (orderBy) {
+    case 'performance':
+      sort.unshift({
+        'performance.reply': {
+          order: reverse ? 'asc' : 'desc',
+        },
+      });
+      break;
+    case 'reaction':
+      sort.unshift({
+        // eslint-disable-next-line camelcase
+        reaction_count: {
+          order: reverse ? 'asc' : 'desc',
+        },
+      });
+      break;
+    case 'reply':
+      sort.unshift({
+        // eslint-disable-next-line camelcase
+        reply_count: {
+          order: reverse ? 'asc' : 'desc',
+        },
+      });
+      break;
+    case 'newest':
+    // 'newest' is also the default, fallthrough
+    default:
+      sort.unshift({
+        // eslint-disable-next-line camelcase
+        created_at: {
+          order: reverse ? 'asc' : 'desc',
+        },
+      });
+      break;
+  }
   return sort;
 };
 
@@ -52,7 +81,7 @@ export default {
       const size = args.first || 10;
 
       const { body } = await elastic.search({
-        index: 'threads',
+        index: 'social-posts-*',
         size: size + 1, // +1 to find out if more data is available
         body: {
           query: esQueryObject(args.keyword),
@@ -75,7 +104,7 @@ export default {
         return {
           cursor: stringifyCursor(sort),
           node: {
-            postedAt: new Date(doc.time),
+            createdAt: new Date(doc.created_at),
             title: doc.title,
             content: doc.content,
             platform: {
@@ -84,6 +113,18 @@ export default {
             poster: {
               name: doc.author,
             },
+            group: doc.group && {
+              platform: {
+                name: 'lihkg',
+              },
+              name: doc.group.name,
+            },
+            performance: (doc.performance && doc.performance.reply) || null,
+            likeCount: doc.like_count,
+            dislikeCount: doc.dislike_count,
+            replyCount: doc.reply_count,
+            platformUrl: `https://lihkg.com/thread/${doc.post_id}`,
+            platformId: `${doc.post_id}`,
           },
         };
       });
@@ -109,11 +150,11 @@ export default {
   },
 
   SocialPost: {
-    platform: () => {
-      // TODO(cheungpat): Get social platform info
-      return {
-        name: 'lihkg',
-      };
+    __resolveType: (obj) => {
+      if (obj.platform.name === 'lihkg') {
+        return 'LIHKGSocialPost';
+      }
+      return null;
     },
   },
 };
