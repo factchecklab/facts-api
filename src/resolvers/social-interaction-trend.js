@@ -15,10 +15,12 @@ const esQueryObject = (keyword) => {
 
 export default {
   Query: {
-    socialPostTrend: async (parent, args, { elastic }) => {
+    socialInteractionTrend: async (parent, args, { elastic }) => {
       // TODO (samueltangz): support more arguments apart from `keyword`
       // TODO (samueltangz): I think the histogram is bucketed per day in GMT+0.
       // Need to discuss if histogram buckets can be customizable.
+      // TODO (samueltangz): the interactions should be calculated by the bucket the interaction
+      // is given, instead of the bucket that when the post is created.
 
       /* eslint-disable camelcase */
       const { body } = await elastic.search({
@@ -27,21 +29,28 @@ export default {
         body: {
           query: esQueryObject(args.keyword),
           aggs: {
-            posts_over_time: {
+            interactions_over_time: {
               date_histogram: {
                 field: 'created_at',
                 calendar_interval: '1d',
+              },
+              aggs: {
+                xly: {
+                  sum: {
+                    field: 'interaction_count',
+                  },
+                },
               },
             },
           },
         },
       });
       /* eslint-enable camelcase */
-      const dataPoints = body.aggregations.posts_over_time.buckets.map(
+      const dataPoints = body.aggregations.interactions_over_time.buckets.map(
         (bucket) => {
           return {
             time: new Date(bucket.key),
-            value: bucket.doc_count,
+            value: bucket.xly.value,
           };
         }
       );

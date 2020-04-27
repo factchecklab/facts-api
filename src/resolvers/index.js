@@ -7,6 +7,7 @@ import asset from './asset';
 import socialPost from './social-post';
 import socialUser from './social-user';
 import socialPostTrend from './social-post-trend';
+import socialInteractionTrend from './social-interaction-trend';
 
 export default [
   entity,
@@ -18,4 +19,5 @@ export default [
   socialPost,
   socialUser,
   socialPostTrend,
+  socialInteractionTrend,
 ];

@@ -14,6 +14,7 @@ import socialGroup from './social-group';
 import socialUser from './social-user';
 import socialPost from './social-post';
 import socialPostTrend from './social-post-trend';
+import socialInteractionTrend from './social-interaction-trend';
 import lihkg from './lihkg';
 
 const link = gql`
@@ -57,5 +58,6 @@ export default [
   socialUser,
   socialPost,
   socialPostTrend,
+  socialInteractionTrend,
   lihkg,
 ];
