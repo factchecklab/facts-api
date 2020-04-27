@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export default gql`
   extend type Query {
-    socialPostTrend(keyword: String): SocialPostTrend!
+    socialPostTrend(keyword: String, timeframe: String): SocialPostTrend!
   }
 
   type SocialPostTrend {

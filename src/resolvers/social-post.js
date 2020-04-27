@@ -1,3 +1,5 @@
+import { timeframes } from '../search/social-weather';
+
 const stringifyCursor = (cursor) => {
   return Buffer.from(JSON.stringify(cursor)).toString('base64');
 };
@@ -60,16 +62,20 @@ const esSortObject = (orderBy, reverse) => {
   return sort;
 };
 
-const esQueryObject = (keyword) => {
-  return keyword
-    ? {
-        /* eslint-disable-next-line camelcase */
-        multi_match: {
-          query: keyword,
-          fields: ['title', 'content'],
-        },
-      }
-    : undefined;
+const esQueryObject = (keyword, timeframe) => {
+  /* eslint-disable camelcase */
+  const queryObject = {
+    bool: {
+      must: [{ range: { created_at: { from: timeframe.from } } }],
+    },
+  };
+  /* eslint-enable camelcase */
+
+  if (keyword) {
+    // STODO: keyword should be searching `title`s
+    queryObject.bool.must.push({ match: { content: keyword } });
+  }
+  return queryObject;
 };
 
 export default {
@@ -79,12 +85,13 @@ export default {
       const afterCursor = args.after || args.before || undefined;
       const reverse = !forward || args.reverse;
       const size = args.first || 10;
+      const timeframe = timeframes[args.timeframe] || timeframes['30d'];
 
       const { body } = await elastic.search({
         index: 'social-posts-*',
         size: size + 1, // +1 to find out if more data is available
         body: {
-          query: esQueryObject(args.keyword),
+          query: esQueryObject(args.keyword, timeframe),
           sort: esSortObject(args.orderBy, reverse),
           /* eslint-disable-next-line camelcase */
           search_after: afterCursor

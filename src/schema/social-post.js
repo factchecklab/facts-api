@@ -4,6 +4,7 @@ export default gql`
   extend type Query {
     socialPosts(
       keyword: String
+      timeframe: String
       orderBy: SocialPostOrderField
       reverse: Boolean
       after: Cursor
