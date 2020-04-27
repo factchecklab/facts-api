@@ -20,7 +20,7 @@ export default {
 
       /* eslint-disable camelcase */
       const { body } = await elastic.search({
-        index: 'posts',
+        index: 'threads',
         size: 0,
         body: {
           query: esQueryObject(args.keyword),
