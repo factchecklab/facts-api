@@ -72,7 +72,7 @@ const esQueryObject = (keyword, timeframe) => {
   /* eslint-enable camelcase */
 
   if (keyword) {
-    // STODO: keyword should be searching `title`s
+    // TODO (samueltangz): keyword should be searching `title`s as well
     queryObject.bool.must.push({ match: { content: keyword } });
   }
   return queryObject;
