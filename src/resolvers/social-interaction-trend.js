@@ -1,8 +1,10 @@
-const esQueryObject = (keyword) => {
+import { timeframes } from '../search/social-weather';
+
+const esQueryObject = (keyword, timeframe) => {
   /* eslint-disable camelcase */
   const queryObject = {
     bool: {
-      must: [{ range: { created_at: { from: 'now-30d' } } }],
+      must: [{ range: { created_at: { from: timeframe.from } } }],
     },
   };
   /* eslint-enable camelcase */
@@ -22,17 +24,19 @@ export default {
       // TODO (samueltangz): the interactions should be calculated by the bucket the interaction
       // is given, instead of the bucket that when the post is created.
 
+      const timeframe = timeframes[args.timeframe] || timeframes['30d'];
+
       /* eslint-disable camelcase */
       const { body } = await elastic.search({
         index: 'social-posts-*',
         size: 0,
         body: {
-          query: esQueryObject(args.keyword),
+          query: esQueryObject(args.keyword, timeframe),
           aggs: {
             interactions_over_time: {
               date_histogram: {
                 field: 'created_at',
-                calendar_interval: '1d',
+                calendar_interval: timeframe.interval,
               },
               aggs: {
                 xly: {

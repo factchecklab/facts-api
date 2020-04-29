@@ -1,8 +1,10 @@
-const esQueryObject = (keyword) => {
+import { timeframes } from '../search/social-weather';
+
+const esQueryObject = (keyword, timeframe) => {
   /* eslint-disable camelcase */
   const queryObject = {
     bool: {
-      must: [{ range: { created_at: { from: 'now-30d' } } }],
+      must: [{ range: { created_at: { from: timeframe.from } } }],
     },
   };
   /* eslint-enable camelcase */
@@ -20,17 +22,19 @@ export default {
       // TODO (samueltangz): I think the histogram is bucketed per day in GMT+0.
       // Need to discuss if histogram buckets can be customizable.
 
+      const timeframe = timeframes[args.timeframe] || timeframes['30d'];
+
       /* eslint-disable camelcase */
       const { body } = await elastic.search({
         index: 'social-posts-*',
         size: 0,
         body: {
-          query: esQueryObject(args.keyword),
+          query: esQueryObject(args.keyword, timeframe),
           aggs: {
             posts_over_time: {
               date_histogram: {
                 field: 'created_at',
-                calendar_interval: '1d',
+                calendar_interval: timeframe.interval,
               },
             },
           },
