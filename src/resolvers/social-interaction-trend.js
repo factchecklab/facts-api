@@ -1,4 +1,8 @@
+import dotenv from 'dotenv';
+
 import { timeframes } from '../search/social-weather';
+
+dotenv.config();
 
 const esQueryObject = (keyword, timeframe) => {
   /* eslint-disable camelcase */
@@ -19,8 +23,6 @@ export default {
   Query: {
     socialInteractionTrend: async (parent, args, { elastic }) => {
       // TODO (samueltangz): support more arguments apart from `keyword`
-      // TODO (samueltangz): I think the histogram is bucketed per day in GMT+0.
-      // Need to discuss if histogram buckets can be customizable.
       // TODO (samueltangz): the interactions should be calculated by the bucket the interaction
       // is given, instead of the bucket that when the post is created.
 
@@ -37,6 +39,7 @@ export default {
               date_histogram: {
                 field: 'created_at',
                 calendar_interval: timeframe.interval,
+                time_zone: process.env.ELASTICSEARCH_TIMEZONE || '+00:00',
               },
               aggs: {
                 xly: {
