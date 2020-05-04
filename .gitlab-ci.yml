@@ -39,8 +39,9 @@ audit:
 build_image:
   image: docker:19.03.1
   stage: build
-  only:
-    - branches
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: on_success
   services:
     - docker:19.03.1-dind
   variables:
@@ -80,9 +81,9 @@ build_image:
 deploy:
   image: google/cloud-sdk:alpine
   stage: deploy
-  only:
-    - master
-  when: manual
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: manual
   environment: master
   variables:
     GCR_IMAGE_TAG: $GCR_IMAGE:git-$CI_COMMIT_SHORT_SHA
