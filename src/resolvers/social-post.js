@@ -1,4 +1,4 @@
-import { timeframes } from '../search/social-weather';
+import { timeframes, defaultTimeframe } from '../search/social-weather';
 
 const stringifyCursor = (cursor) => {
   return Buffer.from(JSON.stringify(cursor)).toString('base64');
@@ -85,7 +85,8 @@ export default {
       const afterCursor = args.after || args.before || undefined;
       const reverse = !forward || args.reverse;
       const size = args.first || 10;
-      const timeframe = timeframes[args.timeframe] || timeframes['1m'];
+      const timeframe =
+        timeframes[args.timeframe] || timeframes[defaultTimeframe];
 
       const { body } = await elastic.search({
         index: 'social-posts-*',

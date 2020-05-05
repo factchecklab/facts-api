@@ -27,6 +27,7 @@ services:
     - 4000:4000
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - PIPELINE_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
       - ELASTICSEARCH_ENDPOINT=http://elasticsearch:9200
       - ELASTICSEARCH_TIMEZONE=+08:00
 volumes:

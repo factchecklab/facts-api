@@ -1,6 +1,7 @@
 import { ApolloServer } from 'apollo-server';
 
 import models, { sequelize } from './models';
+import dataPipelineModels from './data-pipeline-models';
 import schema from './schema';
 import resolvers from './resolvers';
 import search, { client as elastic, addHooks } from './search';
@@ -16,6 +17,7 @@ const server = new ApolloServer({
   context: () => {
     return {
       models,
+      dataPipelineModels,
       sequelize,
       elastic,
       search,
