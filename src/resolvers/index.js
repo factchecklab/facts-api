@@ -8,6 +8,9 @@ import socialPost from './social-post';
 import socialUser from './social-user';
 import socialPostTrend from './social-post-trend';
 import socialInteractionTrend from './social-interaction-trend';
+import lihkg from './social-platform/lihkg';
+import discusshk from './social-platform/discusshk';
+import uwants from './social-platform/uwants';
 
 export default [
   entity,
@@ -20,4 +23,7 @@ export default [
   socialUser,
   socialPostTrend,
   socialInteractionTrend,
+  lihkg,
+  discusshk,
+  uwants,
 ];
