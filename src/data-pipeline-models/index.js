@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import Sequelize from 'sequelize';
+import { parse } from '../util/database-connection-string';
 
 dotenv.config();
 
@@ -12,7 +13,10 @@ const sequelizeOptions = {
 };
 
 const sequelize = (() => {
-  return new Sequelize(process.env.PIPELINE_DATABASE_URL, sequelizeOptions);
+  return new Sequelize({
+    ...parse(process.env.PIPELINE_DATABASE_URL),
+    ...sequelizeOptions,
+  });
 })();
 
 const models = {

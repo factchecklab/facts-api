@@ -26,7 +26,8 @@
     "graphql": "^14.6.0",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.26",
-    "pg": "^8.0.0",
+    "pg": "^8.0.3",
+    "pg-connection-string": "^2.2.1",
     "sequelize": "^5.21.5",
     "uuid": "^7.0.3"
   },

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import Sequelize from 'sequelize';
+import { parse } from '../util/database-connection-string';
 
 dotenv.config();
 
@@ -13,7 +14,10 @@ const sequelizeOptions = {
 
 const sequelize = (() => {
   if (process.env.DATABASE_URL) {
-    return new Sequelize(process.env.DATABASE_URL, sequelizeOptions);
+    return new Sequelize({
+      ...parse(process.env.DATABASE_URL),
+      ...sequelizeOptions,
+    });
   } else {
     // Specify the connection parameters using environment variables. A list
     // is available at https://www.postgresql.org/docs/12/libpq-envars.html.
