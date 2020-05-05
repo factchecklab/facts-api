@@ -85,7 +85,7 @@ export default {
       const afterCursor = args.after || args.before || undefined;
       const reverse = !forward || args.reverse;
       const size = args.first || 10;
-      const timeframe = timeframes[args.timeframe] || timeframes['30d'];
+      const timeframe = timeframes[args.timeframe] || timeframes['1m'];
 
       const { body } = await elastic.search({
         index: 'social-posts-*',
