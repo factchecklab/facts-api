@@ -108,29 +108,30 @@ export default {
       }
 
       const edges = result.map(({ _source: doc, sort }) => {
+        const platform = {
+          name: doc.platform_name,
+        };
+
         return {
           cursor: stringifyCursor(sort),
           node: {
+            platform,
             createdAt: new Date(doc.created_at),
             title: doc.title,
             content: doc.content,
-            platform: {
-              name: 'lihkg',
-            },
             poster: {
+              platform,
               name: (doc.user && doc.user.name) || null,
             },
             group: doc.group && {
-              platform: {
-                name: 'lihkg',
-              },
+              platform,
               name: doc.group.name,
             },
             performance: (doc.performance && doc.performance.reply) || null,
             likeCount: doc.like_count,
             dislikeCount: doc.dislike_count,
             replyCount: doc.reply_count,
-            platformUrl: `https://lihkg.com/thread/${doc.post_id}`,
+            viewCount: doc.view_count,
             platformId: `${doc.post_id}`,
           },
         };
@@ -158,9 +159,20 @@ export default {
 
   SocialPost: {
     __resolveType: (obj) => {
-      if (obj.platform.name === 'lihkg') {
-        return 'LIHKGSocialPost';
+      if (!obj.platform) {
+        console.log('Expecting social post platform to be non-null. Got null.');
+        return null;
       }
+
+      switch (obj.platform.name) {
+        case 'lihkg':
+          return 'LIHKGSocialPost';
+        case 'discusshk':
+          return 'DiscussHKSocialPost';
+        case 'uwants':
+          return 'UwantsSocialPost';
+      }
+      console.log(`Unxpected post social platform '${obj.platform_name}'`);
       return null;
     },
   },

@@ -1,16 +1,17 @@
 import gql from 'graphql-tag';
 
 export default gql`
-  type LIHKGSocialUser implements SocialUser {
+  type UwantsSocialUser implements SocialUser {
     # interface fields
     name: String
+    platform: SocialPlatform!
   }
 
-  type LIHKGSocialPost implements SocialPost {
+  type UwantsSocialPost implements SocialPost {
     # interface fields
     platform: SocialPlatform!
     createdAt: Date!
-    poster: LIHKGSocialUser
+    poster: UwantsSocialUser
     group: SocialGroup
     title: String
     content: String

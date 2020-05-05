@@ -15,7 +15,9 @@ import socialUser from './social-user';
 import socialPost from './social-post';
 import socialPostTrend from './social-post-trend';
 import socialInteractionTrend from './social-interaction-trend';
-import lihkg from './lihkg';
+import lihkg from './social-platform/lihkg';
+import discusshk from './social-platform/discusshk';
+import uwants from './social-platform/uwants';
 
 const link = gql`
   scalar Date
@@ -60,4 +62,6 @@ export default [
   socialPostTrend,
   socialInteractionTrend,
   lihkg,
+  discusshk,
+  uwants,
 ];
