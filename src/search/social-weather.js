@@ -21,4 +21,4 @@ export const timeframes = {
   },
 };
 
-export const defaultTimeframe = '30d';
+export const defaultTimeframe = '1m';

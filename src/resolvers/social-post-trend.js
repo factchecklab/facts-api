@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import { timeframes } from '../search/social-weather';
+import { timeframes, defaultTimeframe } from '../search/social-weather';
 
 dotenv.config();
 
@@ -24,7 +24,8 @@ export default {
     socialPostTrend: async (parent, args, { elastic }) => {
       // TODO (samueltangz): support more arguments apart from `keyword`
 
-      const timeframe = timeframes[args.timeframe] || timeframes['30d'];
+      const timeframe =
+        timeframes[args.timeframe] || timeframes[defaultTimeframe];
 
       /* eslint-disable camelcase */
       const { body } = await elastic.search({

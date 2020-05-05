@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import { timeframes } from '../search/social-weather';
+import { timeframes, defaultTimeframe } from '../search/social-weather';
 
 dotenv.config();
 
@@ -26,7 +26,8 @@ export default {
       // TODO (samueltangz): the interactions should be calculated by the bucket the interaction
       // is given, instead of the bucket that when the post is created.
 
-      const timeframe = timeframes[args.timeframe] || timeframes['30d'];
+      const timeframe =
+        timeframes[args.timeframe] || timeframes[defaultTimeframe];
 
       /* eslint-disable camelcase */
       const { body } = await elastic.search({
