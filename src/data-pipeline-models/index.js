@@ -16,7 +16,9 @@ const sequelize = (() => {
 })();
 
 const models = {
-  ReactionDelta: sequelize.import('./reaction-delta'),
+  HourlyReactionDelta: sequelize.import('./hourly-reaction-delta'),
+  DailyReactionDelta: sequelize.import('./daily-reaction-delta'),
+  MonthlyReactionDelta: sequelize.import('./monthly-reaction-delta'),
 };
 
 Object.keys(models).forEach((key) => {

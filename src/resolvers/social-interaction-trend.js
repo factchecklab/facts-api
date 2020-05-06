@@ -1,7 +1,11 @@
 import dotenv from 'dotenv';
 import Sequelize from 'sequelize';
 
-import { timeframes, defaultTimeframe } from '../search/social-weather';
+import {
+  timeframes,
+  defaultTimeframe,
+  reactionDeltaModels,
+} from '../search/social-weather';
 
 const INTERACTION_SAMPLE_SIZE = 1000;
 
@@ -49,41 +53,28 @@ export default {
       const threadIds = body.hits.hits.map((posts) => posts._id);
       const totalInteractions = body.aggregations.total_interactions.value;
 
-      const reactionDeltas = await dataPipelineModels.ReactionDelta.findAll({
+      const reactionDeltaModel =
+        dataPipelineModels[reactionDeltaModels[timeframe.unit]];
+
+      const reactionDeltas = await reactionDeltaModel.findAll({
         attributes: [
-          [
-            Sequelize.fn(
-              'date_trunc',
-              timeframe.unit,
-              Sequelize.col('label_time')
-            ),
-            'time',
-          ],
-          [
-            Sequelize.fn('sum', Sequelize.col('delta_value')),
-            'delta_reactions',
-          ],
+          'time',
+          [Sequelize.fn('sum', Sequelize.col('value')), 'value'],
         ],
         where: {
           identifier: {
             [Op.in]: threadIds,
           },
-          // TODO (samueltangz): prettify this query while implementating boolean query
-          reaction_type: {
-            [Op.in]: ['reply', 'like', 'dislike'],
-          },
         },
         group: ['time'],
         order: [[Sequelize.col('time'), 'ASC']],
-        // This query is not logged as it is too long
-        logging: false,
       });
       /* eslint-enable camelcase */
 
       const dataPoints = reactionDeltas.map((reactionDelta) => {
         return {
           time: reactionDelta.dataValues.time,
-          value: parseInt(reactionDelta.dataValues.delta_reactions, 10),
+          value: parseInt(reactionDelta.dataValues.value, 10),
         };
       });
       const partialTotalInteractions = dataPoints.reduce(

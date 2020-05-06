@@ -29,4 +29,10 @@ export const timeframes = {
   },
 };
 
+export const reactionDeltaModels = {
+  month: 'MonthlyReactionDelta',
+  day: 'DailyReactionDelta',
+  hour: 'HourlyReactionDelta',
+};
+
 export const defaultTimeframe = '1m';
