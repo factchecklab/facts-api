@@ -1,29 +1,16 @@
 import dotenv from 'dotenv';
 
-import { timeframes, defaultTimeframe } from '../search/social-weather';
+import {
+  timeframes,
+  defaultTimeframe,
+  esQueryObject,
+} from '../search/social-weather';
 
 dotenv.config();
-
-const esQueryObject = (keyword, timeframe) => {
-  /* eslint-disable camelcase */
-  const queryObject = {
-    bool: {
-      must: [{ range: { created_at: { from: timeframe.from } } }],
-    },
-  };
-  /* eslint-enable camelcase */
-
-  if (keyword) {
-    queryObject.bool.must.push({ match: { content: keyword } });
-  }
-  return queryObject;
-};
 
 export default {
   Query: {
     socialPostTrend: async (parent, args, { elastic }) => {
-      // TODO (samueltangz): support more arguments apart from `keyword`
-
       const timeframe =
         timeframes[args.timeframe] || timeframes[defaultTimeframe];
 
@@ -32,7 +19,7 @@ export default {
         index: 'social-posts-*',
         size: 0,
         body: {
-          query: esQueryObject(args.keyword, timeframe),
+          query: esQueryObject(args.query, timeframe),
           aggs: {
             posts_over_time: {
               date_histogram: {
