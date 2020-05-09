@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 export default gql`
   extend type Query {
     socialPosts(
-      keyword: String
+      query: String
       timeframe: String
       orderBy: SocialPostOrderField
       reverse: Boolean
