@@ -1,40 +1,42 @@
+const stringifyCursor = (cursor) => {
+  return Buffer.from(JSON.stringify(cursor)).toString('base64');
+};
+
 export default {
   Query: {
-    socialGroups: (parent, args, { dataPipelineModels, elastic }) => {
+    socialGroups: async (parent, args, { elastic }) => {
       /* eslint-disable camelcase */
-      return [
-        {
-          platform: { name: 'lihkg' },
-          group_id: 1,
-          name: '吹水台',
+      const { body } = await elastic.search({
+        index: 'social-groups',
+        size: 1000,
+        body: {
+          sort: [{ _id: 'asc' }],
         },
-        {
-          platform: { name: 'lihkg' },
-          group_id: 2,
-          name: '時事台',
-        },
-        {
-          platform: { name: 'lihkg' },
-          group_id: 3,
-          name: '財經台',
-        },
-        {
-          platform: { name: 'lihkg' },
-          group_id: 4,
-          name: '娛樂台',
-        },
-        {
-          platform: { name: 'lihkg' },
-          group_id: 5,
-          name: '上班台',
-        },
-        {
-          platform: { name: 'discusshk' },
-          group_id: 6,
-          name: '香港及世界新聞討論',
-        },
-      ];
+      });
+
+      const result = body.hits.hits;
+
+      const edges = result.map((doc) => {
+        const { _source, sort } = doc;
+        return {
+          cursor: stringifyCursor(sort),
+          node: {
+            id: doc._id,
+            name: _source.group_name,
+            platformId: _source.platform_id,
+            platform: { name: _source.platform_name },
+          },
+        };
+      });
       /* eslint-enable camelcase */
+
+      return {
+        edges,
+        nodes: edges.map((edge) => {
+          return edge.node;
+        }),
+        totalCount: body.hits.total.value,
+      };
     },
   },
 };
