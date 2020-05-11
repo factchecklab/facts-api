@@ -49,39 +49,34 @@ export const esQueryObject = (query, timeframe) => {
   };
 
   const parsedQuery = searchQuery.parse(query, {
-    keywords: ['title', 'content', 'platform', 'group', 'user'],
+    keywords: ['title', 'content', 'platform', 'group', 'user', 'text'],
     alwaysArray: true,
+    tokenize: true,
   });
 
   const queryObject = { bool: { must: [] } };
 
   // Sets the time range
-  /* eslint-disable camelcase */
   queryObject.bool.must.push({
+    // eslint-disable-next-line camelcase
     range: { created_at: { from: timeframe.from } },
   });
-  /* eslint-enable camelcase */
-
-  // Finish earlier if the parsedQuery is just a string
-  if (typeof parsedQuery === 'string') {
-    if (parsedQuery) {
-      const text = parsedQuery;
-      queryObject.bool.must.push({
-        bool: {
-          should: [{ match: { title: text } }, { match: { content: text } }],
-        },
-      });
-    }
-    return queryObject;
-  }
 
   if (parsedQuery.text) {
     const { text } = parsedQuery;
-    queryObject.bool.must.push({
-      bool: {
-        should: [{ match: { title: text } }, { match: { content: text } }],
-      },
+    const condition = (text || []).map((value) => {
+      return {
+        // eslint-disable-next-line camelcase
+        multi_match: {
+          query: value,
+          fields: ['title', 'content'],
+        },
+      };
     });
+
+    if (condition.length > 0) {
+      queryObject.bool.must.push({ bool: { should: condition } });
+    }
   } else {
     // Sets the title condition
     const titleCondition = convert('title', parsedQuery.title);
