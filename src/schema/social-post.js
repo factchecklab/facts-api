@@ -75,7 +75,7 @@ export default gql`
     The group in which the post is posted in. Can be null if group does not
     apply for this social post.
     """
-    group: SocialGroup @stub
+    group: SocialGroup
 
     """
     The title of the social post.
