@@ -7,6 +7,7 @@ import asset from './asset';
 import socialPost from './social-post';
 import socialUser from './social-user';
 import socialPostTrend from './social-post-trend';
+import socialPostKeywords from './social-post-keywords';
 import socialInteractionTrend from './social-interaction-trend';
 import socialGroup from './social-group';
 import lihkg from './social-platform/lihkg';
@@ -23,6 +24,7 @@ export default [
   socialPost,
   socialUser,
   socialPostTrend,
+  socialPostKeywords,
   socialInteractionTrend,
   socialGroup,
   lihkg,

@@ -13,6 +13,7 @@ import socialPlatform from './social-platform';
 import socialGroup from './social-group';
 import socialUser from './social-user';
 import socialPost from './social-post';
+import socialPostKeywords from './social-post-keywords';
 import socialPostTrend from './social-post-trend';
 import socialInteractionTrend from './social-interaction-trend';
 import lihkg from './social-platform/lihkg';
@@ -59,6 +60,7 @@ export default [
   socialGroup,
   socialUser,
   socialPost,
+  socialPostKeywords,
   socialPostTrend,
   socialInteractionTrend,
   lihkg,
