@@ -7,6 +7,8 @@ import resolvers from './resolvers';
 import search, { client as elastic, addHooks } from './search';
 import storage from './storage';
 import directives from './directives';
+import { logger } from './logging';
+import { errorLoggingPlugin } from './plugins/error-logging';
 
 addHooks(models);
 
@@ -22,11 +24,13 @@ const server = new ApolloServer({
       elastic,
       search,
       storage,
+      logger,
     };
   },
   resolvers,
   schemaDirectives: directives,
   introspection: true,
+  plugins: [errorLoggingPlugin],
 });
 
 // The `listen` method launches a web server.
