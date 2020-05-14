@@ -6,6 +6,7 @@ import attachment from './attachment';
 import asset from './asset';
 import socialPost from './social-post';
 import socialUser from './social-user';
+import socialPostLinks from './social-post-links';
 import socialPostTrend from './social-post-trend';
 import socialPostKeywords from './social-post-keywords';
 import socialInteractionTrend from './social-interaction-trend';
@@ -23,6 +24,7 @@ export default [
   asset,
   socialPost,
   socialUser,
+  socialPostLinks,
   socialPostTrend,
   socialPostKeywords,
   socialInteractionTrend,
