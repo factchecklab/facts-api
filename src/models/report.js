@@ -43,6 +43,17 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
+      airtableId: {
+        type: DataTypes.TEXT,
+        field: 'airtable_id',
+        allowNull: true,
+        unqiue: true,
+      },
+      airtableUpdatedAt: {
+        type: DataTypes.DATE,
+        field: 'airtable_updated_at',
+        allowNull: true,
+      },
     },
     {
       sequelize,

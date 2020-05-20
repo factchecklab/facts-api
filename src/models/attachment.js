@@ -23,6 +23,12 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
       },
       location: DataTypes.TEXT,
+      airtableId: {
+        type: DataTypes.TEXT,
+        field: 'airtable_id',
+        allowNull: true,
+        unqiue: true,
+      },
     },
     {
       sequelize,
