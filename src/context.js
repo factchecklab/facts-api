@@ -3,6 +3,7 @@ import dataPipelineModels from './data-pipeline-models';
 import search, { client as elastic } from './search';
 import storage from './storage';
 import { logger } from './logging';
+import airtable from './airtable';
 
 const context = () => {
   return {
@@ -13,6 +14,7 @@ const context = () => {
     search,
     storage,
     logger,
+    airtable,
   };
 };
 
