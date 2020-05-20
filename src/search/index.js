@@ -13,10 +13,4 @@ const search = {
   Topic: topic,
 };
 
-export const addHooks = (models) => {
-  Object.keys(search).forEach((key) => {
-    search[key].addHooks(models, client);
-  });
-};
-
 export default search;
