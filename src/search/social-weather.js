@@ -49,7 +49,16 @@ export const esQueryObject = (query, timeframe) => {
   };
 
   const parsedQuery = searchQuery.parse(query, {
-    keywords: ['title', 'content', 'platform', 'group', 'user', 'text'],
+    keywords: [
+      'title',
+      'content',
+      'platform',
+      'group',
+      'user',
+      'url',
+      'post',
+      'text',
+    ],
     alwaysArray: true,
     tokenize: true,
   });
@@ -103,13 +112,31 @@ export const esQueryObject = (query, timeframe) => {
     queryObject.bool.must.push({ bool: { should: groupCondition } });
   }
 
-  // Sets the user condition
-  const userCondition = convert('user.id.keyword', parsedQuery.user, true);
-  if (userCondition.length > 0) {
+  if (parsedQuery.user) {
+    const { user } = parsedQuery;
+    const userCondition = user.map((value) => {
+      return {
+        // eslint-disable-next-line camelcase
+        multi_match: {
+          query: value,
+          fields: ['user.id.keyword', 'user.name.keyword'],
+        },
+      };
+    });
     queryObject.bool.must.push({ bool: { should: userCondition } });
   }
-  // TODO (samueltangz): user handle should be able to be searched via this field
-  // see https://gitlab.com/maathk/responselist-api/-/issues/35
+
+  // Sets the URL condition
+  const urlCondition = convert('content_urls.keyword', parsedQuery.url, true);
+  if (urlCondition.length > 0) {
+    queryObject.bool.must.push({ bool: { should: urlCondition } });
+  }
+
+  // Sets the post condition
+  const postCondition = convert('_id', parsedQuery.post, true);
+  if (postCondition.length > 0) {
+    queryObject.bool.must.push({ bool: { should: postCondition } });
+  }
 
   return queryObject;
 };
