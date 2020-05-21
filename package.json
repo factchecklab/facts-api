@@ -29,6 +29,7 @@
     "graphql": "^14.6.0",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.26",
+    "node-fetch": "^2.6.0",
     "pg": "^8.0.3",
     "pg-connection-string": "^2.2.1",
     "search-query-parser": "^1.5.5",

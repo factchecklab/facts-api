@@ -1,6 +1,7 @@
 import mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import fetch from 'node-fetch';
 
 export const generateAssetUrl = async (storage, asset, options) => {
   const bucket = storage.bucket(process.env.ASSETS_STORAGE_BUCKET);
@@ -59,6 +60,18 @@ export const uploadAsset = async (storage, file) => {
   return uploadAssetFromStream(storage, createReadStream(), {
     filename,
     contentType: mimetype,
+  });
+};
+
+export const uploadAssetFromUrl = async (
+  storage,
+  url,
+  { filename, contentType }
+) => {
+  const response = await fetch(url);
+  return uploadAssetFromStream(storage, response.body, {
+    filename,
+    contentType,
   });
 };
 
