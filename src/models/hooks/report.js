@@ -5,15 +5,23 @@ import {
 import { modelToAirtable } from '../../airtable/report';
 
 const init = ({ Report }, context, hookOptions) => {
-  const { disableAirtable } = hookOptions || {};
-  const { airtable, elastic } = context;
+  let { disableAirtable } = hookOptions || {};
+  const { airtable, elastic, logger } = context;
+
+  if (!disableAirtable && !process.env.AIRTABLE_API_KEY) {
+    logger.info(
+      'Airtable hook disabled because AIRTABLE_API_KEY is not configured.'
+    );
+    disableAirtable = true;
+  }
+
   Report.addHook('afterSave', async (report, options) => {
     const hook = async () => {
       if (!disableAirtable) {
         try {
           await modelToAirtable(airtable, report, { hooks: false }, context);
         } catch (error) {
-          console.error(
+          logger.error(
             `Error occurred while saving Report with ID ${report.id} to airtable:`,
             error
           );
@@ -23,7 +31,7 @@ const init = ({ Report }, context, hookOptions) => {
       try {
         await saveElastic(elastic, report, { hooks: false });
       } catch (error) {
-        console.error(
+        logger.error(
           `Error occurred while indexing Report with ID ${report.id}:`,
           error
         );
@@ -47,7 +55,7 @@ const init = ({ Report }, context, hookOptions) => {
         await removeElastic(elastic, report, { hooks: false });
       }
     } catch (error) {
-      console.error(
+      logger.error(
         `Error occurred while removing index for Report with ID ${report.id}:`,
         error
       );
