@@ -41,13 +41,6 @@ export const defaultTimeframe = '1m';
 
 export const esQueryObject = (query, timeframe) => {
   // Given a key and an array, convert it into an elasticsearch query object conjuncted with and's
-  const convert = function (key, values, exact = false) {
-    const condition = exact ? 'term' : 'match';
-    return (values || []).map((value) => {
-      return { [condition]: { [key]: value } };
-    });
-  };
-
   const parsedQuery = searchQuery.parse(query, {
     keywords: [
       'title',
@@ -63,80 +56,152 @@ export const esQueryObject = (query, timeframe) => {
     tokenize: true,
   });
 
-  const queryObject = { bool: { must: [] } };
-
   // Sets the time range
-  queryObject.bool.must.push({
+  const filterClause = {
     // eslint-disable-next-line camelcase
     range: { created_at: { from: timeframe.from } },
-  });
+  };
+  const mustClauses = buildBooleanClauses(parsedQuery);
+  const mustNotClauses = buildBooleanClauses(parsedQuery.exclude);
 
-  if (parsedQuery.text) {
-    const { text } = parsedQuery;
-    const condition = (text || []).map((value) => {
-      return {
-        // eslint-disable-next-line camelcase
-        multi_match: {
-          query: value,
-          fields: ['title', 'content'],
-        },
-      };
+  // Update query object
+  const boolQuery = {};
+  boolQuery.filter = filterClause;
+  if (mustClauses.length) {
+    boolQuery.must = mustClauses;
+  }
+  if (mustNotClauses.length) {
+    // eslint-disable-next-line camelcase
+    boolQuery.must_not = mustNotClauses;
+  }
+
+  return {
+    bool: boolQuery,
+  };
+};
+
+/**
+ * Return query clauses for elasticsearch boolean query.
+ *
+ * Returns an array of clauses for specifying a boolean query 'occurrence'
+ * such as 'must', 'must_not'.
+ *
+ */
+export const buildBooleanClauses = (conditions) => {
+  let { text } = conditions;
+  const { title, content, group, user, url, post, platform } = conditions;
+  const clauses = [];
+
+  /**
+   * This section handles text, title, and content, which use 'match' to
+   * search for textual data.
+   */
+
+  // Sets the title condition
+  if (text) {
+    // for some reason `alwaysArray` does not take effect in exclude list, hence
+    // wrapping the text value as array if it is not an array.
+    if (!Array.isArray(text)) {
+      text = [text];
+    }
+    if (text.length > 0) {
+      const subClauses = text.map((value) => {
+        return {
+          // eslint-disable-next-line camelcase
+          multi_match: {
+            query: value,
+            fields: ['text', 'content'],
+          },
+        };
+      });
+      clauses.push(
+        subClauses.length === 1
+          ? subClauses[0]
+          : { bool: { should: subClauses } }
+      );
+    }
+  }
+
+  // Sets the title condition
+  if (title && title.length > 0) {
+    const subClauses = title.map((value) => {
+      return { match: { title: value } };
+    });
+    clauses.push(
+      subClauses.length === 1 ? subClauses[0] : { bool: { should: subClauses } }
+    );
+  }
+
+  // Sets the content condition
+  if (content && content.length > 0) {
+    const subClauses = content.map((value) => {
+      return { match: { content: value } };
+    });
+    clauses.push(
+      subClauses.length === 1 ? subClauses[0] : { bool: { should: subClauses } }
+    );
+  }
+
+  /**
+   * This section handles other fields that match by 'term' (exact match).
+   */
+
+  // Sets the group condition
+  if (group && group.length > 0) {
+    const platformList = group
+      .filter((value) => {
+        return value.endsWith('_*');
+      })
+      .map((value) => {
+        return value.replace(/_\*$/, '');
+      });
+    const groupList = group.filter((value) => {
+      return !value.endsWith('_*');
     });
 
-    if (condition.length > 0) {
-      queryObject.bool.must.push({ bool: { should: condition } });
+    const subClauses = [];
+    if (platformList.length > 0) {
+      subClauses.push({
+        terms: { 'group.platform_name.keyword': platformList },
+      });
     }
-  } else {
-    // Sets the title condition
-    const titleCondition = convert('title', parsedQuery.title);
-    if (titleCondition.length > 0) {
-      queryObject.bool.must.push({ bool: { should: titleCondition } });
+    if (groupList.length > 0) {
+      subClauses.push({
+        terms: { 'group.id.keyword': groupList },
+      });
     }
 
-    // Sets the content condition
-    const contentCondition = convert('content', parsedQuery.content);
-    if (contentCondition.length > 0) {
-      queryObject.bool.must.push({ bool: { should: contentCondition } });
-    }
+    clauses.push(
+      subClauses.length === 1 ? subClauses[0] : { bool: { should: subClauses } }
+    );
   }
 
   // Sets the group condition
-  const groupCondition = (parsedQuery.group || []).map((value) => {
-    if (!value.endsWith('_*')) {
-      return { term: { 'group.id.keyword': value } };
-    }
-    const platform = value.replace(/_\*$/, '');
-    return { term: { 'group.platform_name.keyword': platform } };
-  });
-  if (groupCondition.length > 0) {
-    queryObject.bool.must.push({ bool: { should: groupCondition } });
-  }
-
-  if (parsedQuery.user) {
-    const { user } = parsedQuery;
-    const userCondition = user.map((value) => {
-      return {
-        // eslint-disable-next-line camelcase
-        multi_match: {
-          query: value,
-          fields: ['user.id.keyword', 'user.name.keyword'],
-        },
-      };
+  if (user && user.length > 0) {
+    clauses.push({
+      bool: {
+        should: [
+          { terms: { 'user.id.keyword': user } },
+          { terms: { 'user.name.keyword': user } },
+        ],
+      },
     });
-    queryObject.bool.must.push({ bool: { should: userCondition } });
   }
 
   // Sets the URL condition
-  const urlCondition = convert('content_urls.keyword', parsedQuery.url, true);
-  if (urlCondition.length > 0) {
-    queryObject.bool.must.push({ bool: { should: urlCondition } });
+  if (url && url.length > 0) {
+    clauses.push({ terms: { 'content_urls.keyword': url } });
   }
 
   // Sets the post condition
-  const postCondition = convert('_id', parsedQuery.post, true);
-  if (postCondition.length > 0) {
-    queryObject.bool.must.push({ bool: { should: postCondition } });
+  if (post && post.length > 0) {
+    clauses.push({ terms: { _id: post } });
   }
 
-  return queryObject;
+  // Sets the platform condition
+  if (platform && platform.length > 0) {
+    clauses.push({ terms: { 'platform_name.keyword': platform } });
+  }
+
+  return clauses;
 };
