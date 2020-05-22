@@ -1,6 +1,6 @@
 const indexName = 'reports';
 
-const save = async (client, report, options) => {
+export const save = async (client, report, options) => {
   const {
     id,
     documentId,
@@ -29,14 +29,20 @@ const save = async (client, report, options) => {
   });
 };
 
-const remove = async (client, { documentId }, options) => {
+export const remove = async (client, { documentId }, options) => {
   await client.delete({
     index: indexName,
     id: documentId,
   });
 };
 
-const searchByKeyword = async (client, keyword, closed, offset, limit) => {
+export const searchByKeyword = async (
+  client,
+  keyword,
+  closed,
+  offset,
+  limit
+) => {
   const { body } = await client.search({
     index: indexName,
     from: offset,
@@ -63,7 +69,7 @@ const searchByKeyword = async (client, keyword, closed, offset, limit) => {
   return body.hits.hits.map((doc) => doc._id);
 };
 
-const searchSimilarByContent = async (
+export const searchSimilarByContent = async (
   client,
   documentId,
   content,
@@ -105,35 +111,4 @@ const searchSimilarByContent = async (
     },
   });
   return body.hits.hits.map((doc) => doc._id);
-};
-
-const addHooks = ({ Report }, client) => {
-  Report.addHook('afterSave', async (report, options) => {
-    try {
-      await save(client, report, options);
-    } catch (error) {
-      console.error(
-        `Error occurred while indexing Report with ID ${report.id}:`,
-        error
-      );
-    }
-  });
-  Report.addHook('afterDestroy', async (report, options) => {
-    try {
-      await remove(client, report, options);
-    } catch (error) {
-      console.error(
-        `Error occurred while removing index for Report with ID ${report.id}:`,
-        error
-      );
-    }
-  });
-};
-
-export default {
-  save,
-  remove,
-  addHooks,
-  searchByKeyword,
-  searchSimilarByContent,
 };

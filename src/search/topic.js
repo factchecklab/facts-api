@@ -107,33 +107,9 @@ const searchSimilarByMessageContent = async (
   return body.hits.hits.map((doc) => doc._id);
 };
 
-const addHooks = ({ Topic }, client) => {
-  Topic.addHook('afterSave', async (topic, options) => {
-    try {
-      await save(client, topic, options);
-    } catch (error) {
-      console.error(
-        `Error occurred while indexing Topic with ID ${topic.id}:`,
-        error
-      );
-    }
-  });
-  Topic.addHook('afterDestroy', async (topic, options) => {
-    try {
-      await remove(client, topic, options);
-    } catch (error) {
-      console.error(
-        `Error occurred while removing index for Topic with ID ${topic.id}:`,
-        error
-      );
-    }
-  });
-};
-
 export default {
   save,
   remove,
-  addHooks,
   searchByKeyword,
   searchSimilarByMessageContent,
 };
