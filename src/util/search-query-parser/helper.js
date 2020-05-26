@@ -68,11 +68,15 @@ export const match = (fieldname, values) => {
 };
 
 export const multimatch = (fieldnames, values) => {
-  if (!Array.isArray(values) || !values.length) {
+  if (!Array.isArray(values)) {
+    return null;
+  }
+  const filteredValues = values.filter((value) => value.length);
+  if (!filteredValues.length) {
     return null;
   }
 
-  const subClauses = values.map((value) => {
+  const subClauses = filteredValues.map((value) => {
     return {
       // eslint-disable-next-line camelcase
       multi_match: {
