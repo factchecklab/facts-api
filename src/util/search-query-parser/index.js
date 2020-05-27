@@ -69,6 +69,7 @@ const parseLogicalExpression = (obj, builder) => {
         should: obj.children.map((child) => {
           return { bool: parseLogicalExpression(child, builder) };
         }),
+        minimum_should_match: 1, // eslint-disable-line camelcase
       };
     case 'not':
       return {
