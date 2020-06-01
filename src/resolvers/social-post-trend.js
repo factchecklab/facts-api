@@ -5,6 +5,7 @@ import {
   defaultTimeframe,
   esQueryObject,
 } from '../search/social-weather';
+import { padBuckets } from '../util/social-weather';
 
 dotenv.config();
 
@@ -45,7 +46,7 @@ export default {
       }, 0);
 
       return {
-        dataPoints,
+        dataPoints: padBuckets(dataPoints, timeframe),
         total: sumValue,
       };
     },

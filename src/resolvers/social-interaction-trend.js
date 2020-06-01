@@ -7,6 +7,7 @@ import {
   reactionDeltaModels,
   esQueryObject,
 } from '../search/social-weather';
+import { padBuckets } from '../util/social-weather';
 
 const INTERACTION_SAMPLE_SIZE = 1000;
 
@@ -78,7 +79,7 @@ export default {
       });
 
       return {
-        dataPoints: scaledDataPoints,
+        dataPoints: padBuckets(scaledDataPoints, timeframe),
         total: totalInteractions,
       };
     },

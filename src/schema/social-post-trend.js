@@ -12,6 +12,6 @@ export default gql`
 
   type SocialPostDataPoint {
     time: Date!
-    value: Int!
+    value: Int
   }
 `;

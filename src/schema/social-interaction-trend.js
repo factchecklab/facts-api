@@ -15,6 +15,6 @@ export default gql`
 
   type SocialInteractionDataPoint {
     time: Date!
-    value: Int!
+    value: Int
   }
 `;
