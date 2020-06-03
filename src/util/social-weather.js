@@ -1,5 +1,7 @@
 const moment = require('moment');
 
+const DEFAULT_TIMEZONE = 'Asia/Hong_Kong';
+
 const tickCount = (timeframe) => {
   switch (timeframe.id) {
     case '1y':
@@ -18,7 +20,7 @@ const tickCount = (timeframe) => {
 };
 
 const currentTick = (timeframe) => {
-  const timestamp = moment();
+  const timestamp = moment.tz(new Date(), DEFAULT_TIMEZONE);
 
   const year = timestamp.year();
   const month = timestamp.month();
@@ -27,13 +29,13 @@ const currentTick = (timeframe) => {
 
   switch (timeframe.id) {
     case '1y':
-      return moment.tz([year, month], 'Asia/Hong_Kong').utc();
+      return moment.tz([year, month], DEFAULT_TIMEZONE).utc();
     case '3m':
     case '1m':
-      return moment.tz([year, month, day], 'Asia/Hong_Kong').utc();
+      return moment.tz([year, month, day], DEFAULT_TIMEZONE).utc();
     case '1w':
     case '1d':
-      return moment.tz([year, month, day, hour], 'Asia/Hong_Kong').utc();
+      return moment.tz([year, month, day, hour], DEFAULT_TIMEZONE).utc();
     default:
       throw new Error('undefined timeframe');
   }
