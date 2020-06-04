@@ -101,7 +101,7 @@ export default {
           name: doc.platform_name,
         };
 
-        return {
+        const response = {
           cursor: stringifyCursor(sort),
           node: {
             platform,
@@ -124,6 +124,12 @@ export default {
             platformId: `${doc.post_id}`,
           },
         };
+
+        // Optional fields
+        if (doc.platform_url) {
+          response.platformUrl = doc.platform_url;
+        }
+        return response;
       });
 
       return {
@@ -147,9 +153,9 @@ export default {
   },
 
   SocialPost: {
-    __resolveType: (obj) => {
+    __resolveType: (obj, { logger }) => {
       if (!obj.platform) {
-        console.log('Expecting social post platform to be non-null. Got null.');
+        logger.warn('Expecting social post platform to be non-null. Got null.');
         return null;
       }
 
@@ -160,9 +166,10 @@ export default {
           return 'DiscussHKSocialPost';
         case 'uwants':
           return 'UwantsSocialPost';
+        default:
+          logger.log(`Unxpected post social platform '${obj.platform_name}'`);
+          return 'GenericSocialPost';
       }
-      console.log(`Unxpected post social platform '${obj.platform_name}'`);
-      return null;
     },
   },
 };
