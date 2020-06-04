@@ -1,12 +1,11 @@
 export default {
   SocialUser: {
-    __resolveType: (user) => {
+    __resolveType: (user, { logger }) => {
       if (!user.platform) {
-        console.log('Expecting social user platform to be non-null. Got null.');
+        logger.warn('Expecting social user platform to be non-null. Got null.');
         return null;
       }
 
-      console.log(user);
       switch (user.platform.name) {
         case 'lihkg':
           return 'LIHKGSocialUser';
@@ -14,9 +13,10 @@ export default {
           return 'DiscussHKSocialUser';
         case 'uwants':
           return 'UwantsSocialUser';
+        default:
+          logger.warn(`Unxpected user social platform '${user.platform.name}'`);
+          return 'GenericSocialUser';
       }
-      console.log(`Unxpected user social platform '${user.platform.name}'`);
-      return null;
     },
   },
 };

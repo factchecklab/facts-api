@@ -20,6 +20,7 @@ import socialInteractionTrend from './social-interaction-trend';
 import lihkg from './social-platform/lihkg';
 import discusshk from './social-platform/discusshk';
 import uwants from './social-platform/uwants';
+import generic from './social-platform/generic';
 
 const link = gql`
   scalar Date
@@ -68,4 +69,5 @@ export default [
   lihkg,
   discusshk,
   uwants,
+  generic,
 ];

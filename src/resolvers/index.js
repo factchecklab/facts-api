@@ -14,6 +14,7 @@ import socialGroup from './social-group';
 import lihkg from './social-platform/lihkg';
 import discusshk from './social-platform/discusshk';
 import uwants from './social-platform/uwants';
+import generic from './social-platform/generic';
 
 export default [
   entity,
@@ -32,4 +33,5 @@ export default [
   lihkg,
   discusshk,
   uwants,
+  generic,
 ];
