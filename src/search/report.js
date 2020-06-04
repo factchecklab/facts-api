@@ -1,6 +1,8 @@
 const indexName = 'reports';
 
-export const save = async (client, report, options) => {
+const MIN_MORE_LIKE_THIS_SCORE = 5;
+
+const save = async (client, report, options) => {
   const {
     id,
     documentId,
@@ -29,20 +31,14 @@ export const save = async (client, report, options) => {
   });
 };
 
-export const remove = async (client, { documentId }, options) => {
+const remove = async (client, { documentId }, options) => {
   await client.delete({
     index: indexName,
     id: documentId,
   });
 };
 
-export const searchByKeyword = async (
-  client,
-  keyword,
-  closed,
-  offset,
-  limit
-) => {
+const searchByKeyword = async (client, keyword, closed, offset, limit) => {
   const { body } = await client.search({
     index: indexName,
     from: offset,
@@ -69,25 +65,53 @@ export const searchByKeyword = async (
   return body.hits.hits.map((doc) => doc._id);
 };
 
-export const searchSimilarByContent = async (
+const searchSimilarByContent = async (
   client,
   documentId,
   content,
   offset,
   limit
 ) => {
-  let targetDoc = {
-    _index: indexName,
-  };
+  let query;
+  /* eslint-disable camelcase */
   if (documentId) {
-    targetDoc = {
-      ...targetDoc,
-      _id: documentId,
+    query = {
+      more_like_this: {
+        fields: ['content'],
+        like: {
+          _index: indexName,
+          _id: documentId,
+        },
+        min_term_freq: 1,
+        max_query_terms: 12,
+        min_doc_freq: 1,
+        analyzer: 'cantonese_search',
+      },
     };
   } else {
-    targetDoc = {
-      ...targetDoc,
-      doc: { content },
+    query = {
+      bool: {
+        should: [
+          {
+            more_like_this: {
+              fields: ['content'],
+              like: content,
+              min_term_freq: 1,
+              max_query_terms: 12,
+              min_doc_freq: 1,
+              analyzer: 'cantonese_search',
+            },
+          },
+          {
+            terms: {
+              'url.keyword': [content],
+              // Normally it returns 1 if matched.
+              // Returns MIN_MORE_LIKE_THIS_SCORE so that it is not filter away.
+              boost: MIN_MORE_LIKE_THIS_SCORE,
+            },
+          },
+        ],
+      },
     };
   }
   /* eslint-enable camelcase */
@@ -96,19 +120,17 @@ export const searchSimilarByContent = async (
     index: 'reports',
     from: offset,
     size: limit,
-    body: {
-      query: {
-        /* eslint-disable camelcase */
-        more_like_this: {
-          fields: ['content'],
-          like: [targetDoc],
-          min_term_freq: 1,
-          max_query_terms: 12,
-          min_doc_freq: 1,
-        },
-        /* eslint-enable camelcase */
-      },
-    },
+    body: { query },
   });
-  return body.hits.hits.map((doc) => doc._id);
+
+  return body.hits.hits
+    .filter((doc) => doc._score >= MIN_MORE_LIKE_THIS_SCORE)
+    .map((doc) => doc._id);
+};
+
+export default {
+  save,
+  remove,
+  searchByKeyword,
+  searchSimilarByContent,
 };
