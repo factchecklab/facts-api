@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import Sequelize from 'sequelize';
 import { parse } from '../util/database-connection-string';
+import { logger } from '../logging';
 
 dotenv.config();
 
@@ -9,6 +10,9 @@ const sequelizeOptions = {
   define: {
     timestamps: true,
     underscored: true,
+  },
+  logging: (...args) => {
+    logger.info(...args);
   },
 };
 
