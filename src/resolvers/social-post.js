@@ -167,7 +167,7 @@ export default {
         case 'uwants':
           return 'UwantsSocialPost';
         default:
-          logger.log(`Unxpected post social platform '${obj.platform_name}'`);
+          logger.warn(`Unxpected post social platform '${obj.platform_name}'`);
           return 'GenericSocialPost';
       }
     },
