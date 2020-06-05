@@ -1,5 +1,7 @@
 const indexName = 'topics';
 
+const MIN_MORE_LIKE_THIS_SCORE = 5;
+
 const save = async (client, topic, options) => {
   const {
     id,
@@ -86,25 +88,35 @@ const searchSimilarByMessageContent = async (
     body: {
       query: {
         /* eslint-disable camelcase */
-        more_like_this: {
-          fields: ['message.content'],
-          like: [
+        bool: {
+          should: [
             {
-              _index: indexName,
-              doc: {
-                message: { content },
+              more_like_this: {
+                fields: ['message.content'],
+                like: content,
+                min_term_freq: 1,
+                max_query_terms: 12,
+                min_doc_freq: 1,
+                analyzer: 'cantonese_search',
+              },
+            },
+            {
+              terms: {
+                'message.url.keyword': [content],
+                // Normally it returns 1 if matched.
+                // Returns MIN_MORE_LIKE_THIS_SCORE so that it is not filter away.
+                boost: MIN_MORE_LIKE_THIS_SCORE,
               },
             },
           ],
-          min_term_freq: 1,
-          max_query_terms: 12,
-          min_doc_freq: 1,
         },
         /* eslint-enable camelcase */
       },
     },
   });
-  return body.hits.hits.map((doc) => doc._id);
+  return body.hits.hits
+    .filter((doc) => doc._score >= MIN_MORE_LIKE_THIS_SCORE)
+    .map((doc) => doc._id);
 };
 
 export default {
