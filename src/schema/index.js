@@ -45,5 +45,5 @@ export default [
   attachment,
   asset,
   message,
-  report
+  report,
 ];
