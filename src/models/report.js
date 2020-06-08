@@ -1,81 +1,67 @@
 import Sequelize from 'sequelize';
-import { generateId } from './util';
 
 export default (sequelize, DataTypes) => {
-  class Report extends Sequelize.Model {
-    static async findAllByDocumentIds(documentIds, options) {
-      const { where, ...rest } = options || {};
-      const objs = await Report.findAll({
-        where: { ...where, documentId: documentIds },
-        ...rest,
-      });
-
-      // Return objects in the order the ID is specified, skipping any
-      // objects not found.
-      return documentIds
-        .map((id) => {
-          return objs.find((r) => r.documentId === id);
-        })
-        .filter((r) => !!r);
-    }
-  }
+  class Report extends Sequelize.Model {}
 
   Report.init(
     {
-      documentId: {
+      summary: {
         type: DataTypes.TEXT,
-        field: 'document_id',
         allowNull: false,
-        unqiue: true,
-        defaultValue: generateId,
+        defaultValue: '',
       },
-      content: {
+      conclusion: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      source: {
+      explanation: {
         type: DataTypes.TEXT,
         allowNull: false,
+        defaultValue: '',
       },
-      url: DataTypes.TEXT,
-      closed: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      airtableId: {
+      author: {
         type: DataTypes.TEXT,
-        field: 'airtable_id',
         allowNull: true,
-        unqiue: true,
       },
-      airtableUpdatedAt: {
+      fullReportUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      publishedAt: {
         type: DataTypes.DATE,
-        field: 'airtable_updated_at',
-        allowNull: true,
+        field: 'published_at',
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
     },
     {
       sequelize,
+      paranoid: true,
       modelName: 'report',
     }
   );
 
   Report.associate = (models) => {
-    Report.belongsTo(models.Topic, {
-      as: 'topic',
+    Report.belongsTo(models.Publisher, {
+      as: 'publisher',
+      allowNull: false,
       foreignKey: {
-        name: 'topicId',
-        field: 'topic_id',
+        name: 'publisherId',
+        field: 'publisher_id',
       },
     });
-    Report.hasMany(models.Attachment, {
-      as: 'attachments',
-      foreignKey: 'itemId',
-      constraints: false,
-      scope: {
-        itemType: 'report',
+    Report.belongsToMany(models.ReportTag, {
+      as: 'reportTags',
+      through: 'report_report_tags',
+      foreignKey: {
+        name: 'reportId',
+        field: 'report_id',
       },
+      otherKey: {
+        name: 'reportTagId',
+        field: 'report_tag_id',
+      },
+      timestamps: false,
     });
   };
 
