@@ -1,45 +1,41 @@
 import { NotFound } from './errors';
 import {
-  verify as verifyAssetToken,
-  AssetTokenError,
-} from '../util/asset-token';
-import { ValidationError } from 'apollo-server-koa';
+  stringifyCursor,
+  parseRelayPaginationArgs,
+  makeRelayConnection,
+} from '../util/pagination';
+import { buildPagableQuery } from '../models/pagination';
 
 export default {
   Query: {
-    reports: async (
-      parent,
-      { keyword, closed, offset, limit },
-      { models, search, elastic }
-    ) => {
-      if (keyword) {
-        const ids = await search.Report.searchByKeyword(
-          elastic,
-          keyword,
-          closed,
-          offset,
-          limit
-        );
-        return models.Report.findAllByDocumentIds(ids);
-      } else {
-        let where = {
-          closed: closed || false,
-        };
+    reports: async (parent, args, { models }) => {
+      const pargs = parseRelayPaginationArgs(args);
+      const result = await models.Report.findAll(
+        buildPagableQuery(pargs, ['publishedAt', 'asc'])
+      );
 
-        return models.Report.findAll({
-          where,
-          offset: offset || 0,
-          limit: Math.min(limit || 20, 100),
-          order: [['createdAt', 'desc']],
-        });
+      return makeRelayConnection(
+        result.map((item) => {
+          return {
+            cursor: stringifyCursor([item.publishedAt, item.id]),
+            node: item,
+          };
+        }),
+        pargs
+      );
+    },
+
+    report: async (parent, { id }, { models, logger }) => {
+      const reportId = parseInt(id);
+      logger.debug('Get report by id "%s"', reportId);
+      const report = await models.Report.findByPk(reportId);
+      if (!report) {
+        throw new NotFound(`Cannot find report with id "${reportId}"`);
       }
+      return report;
     },
 
-    report: (parent, { id }, { models }) => {
-      return models.Report.findByPk(id);
-    },
-
-    similarReports: async (
+    searchRelatedReports: async (
       parent,
       { reportId, content, offset, limit },
       { models, search, elastic }
@@ -65,129 +61,111 @@ export default {
   },
 
   Mutation: {
-    createReport: async (parent, { input }, context) => {
-      const { models } = context;
-      const { content, source, url, attachments: attachmentInputs } = input;
+    createReport: (parent, { input }, { sequelize, models, logger }) => {
+      const { tags: tagNames, publisherId: pid, ...rest } = input;
+      const publisherId = parseInt(pid);
 
-      const attachments = await Promise.all(
-        (attachmentInputs || []).map((attachmentInput) => {
-          return (async () => {
-            const { type, location, assetToken } = attachmentInput;
-            if (type === 'url') {
-              return {
-                type,
-                location,
+      return sequelize.transaction(async (t) => {
+        const opts = { transaction: t };
+        if (!(await models.Publisher.findByPk(publisherId, opts))) {
+          throw new NotFound(`Cannot find publisher with id "${publisherId}"`);
+        }
+
+        let reportTags = [];
+        if (tagNames) {
+          reportTags = await Promise.all(
+            tagNames.map(async (tagName) => {
+              const attrs = {
+                name: tagName.trim(),
               };
-            } else if (type === 'asset') {
-              try {
-                return {
-                  type,
-                  assetId: await verifyAssetToken(assetToken),
+              const tags = await models.ReportTag.findOrCreate({
+                ...opts,
+                where: attrs,
+                defaults: attrs,
+              });
+              return tags[0];
+            })
+          );
+        }
+
+        let report = models.Report.build({ ...rest, publisherId });
+
+        report = await report.save({
+          ...opts,
+          returning: true,
+        });
+
+        await report.setReportTags(reportTags, { ...opts });
+
+        return { report };
+      });
+    },
+
+    updateReport: (parent, { input }, { sequelize, models, logger }) => {
+      const { id, tags: tagNames, ...rest } = input;
+      const reportId = parseInt(id);
+
+      logger.debug('Delete report by id "%s"', reportId);
+      return sequelize.transaction(async (t) => {
+        const opts = { transaction: t };
+
+        let report = await models.Report.findByPk(reportId, opts);
+        if (!report) {
+          throw new NotFound(`Cannot find report with id "${reportId}"`);
+        }
+
+        if (tagNames) {
+          await report.setReportTags(
+            await Promise.all(
+              tagNames.map(async (tagName) => {
+                const attrs = {
+                  name: tagName.trim(),
                 };
-              } catch (error) {
-                if (error instanceof AssetTokenError) {
-                  throw new ValidationError(error.toString());
-                }
-                throw error;
-              }
-            } else {
-              throw new Error(`Unexpected attachment type ${type}.`);
-            }
-          })();
-        })
-      );
+                const tags = await models.ReportTag.findOrCreate({
+                  ...opts,
+                  where: attrs,
+                  defaults: attrs,
+                });
+                return tags[0];
+              }),
+              opts
+            )
+          );
+        }
 
-      const report = models.Report.build(
-        { content, source, url, attachments },
-        { include: ['attachments'] }
-      );
-      await report.save({ returning: true });
-      return { report };
+        report = await report.update(rest, {
+          ...opts,
+          returning: true,
+        });
+        return { report };
+      });
     },
 
-    closeReports: async (parent, { input }, { models }) => {
-      const { reportIds } = input;
+    deleteReport: (parent, { input }, { sequelize, models, logger }) => {
+      const { id } = input;
+      const reportId = parseInt(id);
+      logger.debug('Delete report by id "%s"', reportId);
 
-      const reports = await models.Report.findAll({ where: { id: reportIds } });
-      // TODO(cheungpat): Ensure all requested reports are found.
-      reports.forEach((report) => {
-        report.closed = true;
+      return sequelize.transaction(async (t) => {
+        const opts = { transaction: t };
+        const report = await models.Report.findByPk(reportId, opts);
+        if (!report) {
+          throw new NotFound(`Cannot find report with id "${reportId}"`);
+        }
+
+        await report.destry(opts);
+        return { reportId };
       });
-      await Promise.all(
-        reports.map((report) => {
-          return report.save();
-        })
-      );
-      return {};
-    },
-
-    reopenReports: async (parent, { input }, { models }) => {
-      const { reportIds } = input;
-
-      const reports = await models.Report.findAll({ where: { id: reportIds } });
-      // TODO(cheungpat): Ensure all requested reports are found.
-      reports.forEach((report) => {
-        report.closed = false;
-      });
-      await Promise.all(
-        reports.map((report) => {
-          return report.save();
-        })
-      );
-      return {};
-    },
-
-    addReportsToTopic: async (parent, { input }, { models }) => {
-      const { reportIds, topicId } = input;
-
-      const topic = await models.Topic.findByPk(topicId);
-      const reports = await models.Report.findAll({ where: { id: reportIds } });
-      // TODO(cheungpat): Ensure all requested reports are found.
-      reports.forEach((report) => {
-        report.setTopic(topic);
-        report.closed = true;
-      });
-      await Promise.all(
-        reports.map((report) => {
-          return report.save();
-        })
-      );
-      return {};
-    },
-
-    removeReportsFromTopic: async (parent, { input }, { models }) => {
-      const { reportIds } = input;
-
-      const reports = await models.Report.findAll({ where: { id: reportIds } });
-      // TODO(cheungpat): Ensure all requested reports are found.
-      reports.forEach((report) => {
-        report.setTopic(null);
-        report.closed = false;
-      });
-      await Promise.all(
-        reports.map((report) => {
-          return report.save();
-        })
-      );
-      return {};
     },
   },
 
   Report: {
-    topic: (report, args, { models }) => {
-      return report.getTopic();
+    publisher: (report, args, context) => {
+      return report.getPublisher();
     },
 
-    attachments: (report, args, { models }) => {
-      return report.getAttachments();
-    },
-
-    similarTopics: async (report, args, { models, search, elastic }) => {
-      const ids = await search.Topic.searchSimilarByMessageContent(
-        elastic,
-        report.content
-      );
-      return models.Topic.findAllByDocumentIds(ids);
+    tags: (report, args, context) => {
+      return report.getReportTags().map((tag) => tag.name);
     },
   },
 };
