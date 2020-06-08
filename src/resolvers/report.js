@@ -1,4 +1,3 @@
-import { Op } from 'sequelize';
 import { NotFound } from './errors';
 import {
   stringifyCursor,
