@@ -8,12 +8,12 @@ export default gql`
   """
   type PageInfo {
     """
-    The cursor to use when paging forward.
+    The cursor to use when paging backward.
     """
     startCursor: Cursor
 
     """
-    The cursor to use when paging backward.
+    The cursor to use when paging forward.
     """
     endCursor: Cursor
 

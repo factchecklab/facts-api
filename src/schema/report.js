@@ -2,117 +2,311 @@ import gql from 'graphql-tag';
 
 export default gql`
   extend type Query {
-    reports(
-      keyword: String
-      closed: Boolean = false
-      offset: Int = 0
-      limit: Int = 20
-    ): [Report!]!
-    report(id: ID!): Report
+    """
+    List of fact check reports.
+    """
+    reports(after: Cursor, before: Cursor, first: Int): ReportConnection!
 
     """
-    Search for reports that are similar to the specified values.
+    A piece of fact check report.
     """
-    similarReports(
+    report(
       """
-      Report ID which data will be used for similarity search. If specified,
-      the other parameters will be ignored.
+      ID of the report.
       """
-      reportId: ID
+      id: ID!
+    ): Report
 
-      """
-      The report content.
-      """
-      content: String
-
-      """
-      Paging offset.
-      """
-      offset: Int = 0
-
-      """
-      Paging limit.
-      """
-      limit: Int = 20
-    ): [Report!]!
+    searchRelatedReports(content: String): SearchRelatedReportConnection!
   }
 
   extend type Mutation {
+    """
+    Create a new fact check report.
+    """
     createReport(input: CreateReportInput!): CreateReportPayload!
-    closeReports(input: CloseReportsInput!): CloseReportsPayload!
-    reopenReports(input: ReopenReportsInput!): ReopenReportsPayload!
 
     """
-    Matched topic with the specified reports.
+    Update an existing fact check report.
     """
-    addReportsToTopic(input: AddReportsToTopicInput!): AddReportsToTopicPayload!
+    updateReport(input: UpdateReportInput!): UpdateReportPayload!
 
     """
-    Remove the matched topic from the specified reports.
+    Delete an existing fact check report.
     """
-    removeReportsFromTopic(
-      input: RemoveReportsFromTopicInput!
-    ): RemoveReportsFromTopicPayload!
+    deleteReport(input: DeleteReportInput!): DeleteReportPayload!
   }
 
+  """
+  Fact check report connection.
+  """
+  type ReportConnection {
+    """
+    A list of edges.
+    """
+    edges: [ReportEdge!]
+
+    """
+    A list of nodes.
+    """
+    nodes: [Report!]
+
+    """
+    Pagination info.
+    """
+    pageInfo: PageInfo!
+
+    """
+    Total number of nodes.
+    """
+    totalCount: Int!
+  }
+
+  """
+  Fact check report edge.
+  """
+  type ReportEdge {
+    """
+    Cursor for pagination.
+    """
+    cursor: String!
+
+    """
+    The node of this edge.
+    """
+    node: Report
+  }
+
+  """
+  Search related report connection.
+  """
+  type SearchRelatedReportConnection {
+    """
+    A list of edges.
+    """
+    edges: [SearchRelatedReportEdge!]
+
+    """
+    A list of nodes.
+    """
+    nodes: [Report!]
+
+    """
+    Pagination info.
+    """
+    pageInfo: PageInfo!
+
+    """
+    Total number of nodes.
+    """
+    totalCount: Int!
+  }
+
+  """
+  Search related report edge.
+  """
+  type SearchRelatedReportEdge {
+    """
+    Cursor for pagination.
+    """
+    cursor: String!
+
+    """
+    The score for how good this node matches the search.
+    """
+    score: Float
+
+    """
+    The node of this edge.
+    """
+    node: Report
+  }
+
+  """
+  Represents a piece of fact check report.
+  """
   type Report {
+    """
+    The ID of the report.
+    """
     id: ID!
-    content: String!
-    source: String
-    url: String
-    closed: Boolean!
-    attachments: [Attachment!]!
-    topic: Topic
-    createdAt: Date!
-    updatedAt: Date!
 
     """
-    Returns topics that have similar message content for this report.
+    One line summary for describing the fact checked information.
     """
-    similarTopics: [Topic!]!
+    summary: String!
+
+    """
+    The conclusion of fact checking for this information.
+    """
+    conclusion: Conclusion!
+
+    """
+    Further explanation for the fact check conclusion.
+    """
+    explanation: String!
+
+    """
+    The person or entity who authored the report.
+    """
+    author: String
+
+    """
+    The publisher of the fact check report.
+    """
+    publisher: Publisher!
+
+    """
+    The URL of the full report where the public can get more infomation
+    about this fact check report.
+    """
+    fullReportUrl: URL
+
+    """
+    The time when this fact check report is published.
+    """
+    publishedAt: Date!
+
+    """
+    The last updated time of this fact check report.
+    """
+    updatedAt: Date
+
+    """
+    The tags of this fact check report.
+    """
+    tags: [String!]!
   }
 
+  """
+  The input for create report.
+  """
   input CreateReportInput {
-    content: String!
-    source: String!
-    url: String
-    attachments: [AttachmentInput!]
+    """
+    One line summary for describing the fact checked information.
+    """
+    summary: String!
+
+    """
+    The conclusion of fact checking for this information.
+    """
+    conclusion: Conclusion!
+
+    """
+    Further explanation for the fact check conclusion.
+    """
+    explanation: String!
+
+    """
+    The person or entity who authored the report.
+    """
+    author: String
+
+    """
+    The ID of the publisher of the fact check report.
+    """
+    publisherId: ID!
+
+    """
+    The URL of the full report where the public can get more infomation
+    about this fact check report.
+    """
+    fullReportUrl: URL
+
+    """
+    The time when this fact check report is published.
+    """
+    publishedAt: Date
+
+    """
+    The tags of this fact check report.
+    """
+    tags: [String!]!
   }
 
+  """
+  The result for create report.
+  """
   type CreateReportPayload {
+    """
+    The created fact check report.
+    """
     report: Report!
   }
 
-  input CloseReportsInput {
-    reportIds: [ID!]!
+  """
+  The input for update report.
+  """
+  input UpdateReportInput {
+    """
+    The ID of the report to be updated.
+    """
+    id: ID!
+
+    """
+    One line summary for describing the fact checked information.
+    """
+    summary: String
+
+    """
+    The conclusion of fact checking for this information.
+    """
+    conclusion: Conclusion
+
+    """
+    Further explanation for the fact check conclusion.
+    """
+    explanation: String
+
+    """
+    The person or entity who authored the report.
+    """
+    author: String
+
+    """
+    The URL of the full report where the public can get more infomation
+    about this fact check report.
+    """
+    fullReportUrl: URL
+
+    """
+    The time when this fact check report is published.
+    """
+    publishedAt: Date
+
+    """
+    The tags of this fact check report.
+    """
+    tags: [String!]
   }
 
-  type CloseReportsPayload {
-    _: Boolean
+  """
+  The result for update report.
+  """
+  type UpdateReportPayload {
+    """
+    The updated fact check report.
+    """
+    report: Report!
   }
 
-  input ReopenReportsInput {
-    reportIds: [ID!]!
+  """
+  The input for delete report.
+  """
+  input DeleteReportInput {
+    """
+    The ID of the report to be deleted.
+    """
+    id: ID!
   }
 
-  type ReopenReportsPayload {
-    _: Boolean
-  }
-
-  input AddReportsToTopicInput {
-    reportIds: [ID!]!
-    topicId: ID!
-  }
-
-  type AddReportsToTopicPayload {
-    _: Boolean
-  }
-
-  input RemoveReportsFromTopicInput {
-    reportIds: [ID!]!
-  }
-
-  type RemoveReportsFromTopicPayload {
-    _: Boolean
+  """
+  The result for delete report.
+  """
+  type DeleteReportPayload {
+    """
+    The ID of the report that is deleted.
+    """
+    reportId: ID!
   }
 `;
