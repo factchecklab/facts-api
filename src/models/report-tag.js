@@ -1,7 +1,25 @@
 import Sequelize from 'sequelize';
 
 export default (sequelize, DataTypes) => {
-  class ReportTag extends Sequelize.Model {}
+  class ReportTag extends Sequelize.Model {
+    static findOrCreateByNames(names, options) {
+      return Promise.all(
+        names
+          .map((n) => n.trim())
+          .map(async (name) => {
+            const attrs = {
+              name,
+            };
+            const tags = await this.findOrCreate({
+              ...options,
+              where: attrs,
+              defaults: attrs,
+            });
+            return tags[0];
+          })
+      );
+    }
+  }
 
   ReportTag.init(
     {

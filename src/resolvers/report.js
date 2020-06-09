@@ -82,31 +82,20 @@ export default {
           throw new NotFound(`Cannot find publisher with id "${publisherId}"`);
         }
 
-        let reportTags = [];
-        if (tagNames) {
-          reportTags = await Promise.all(
-            tagNames.map(async (tagName) => {
-              const attrs = {
-                name: tagName.trim(),
-              };
-              const tags = await models.ReportTag.findOrCreate({
-                ...opts,
-                where: attrs,
-                defaults: attrs,
-              });
-              return tags[0];
-            })
-          );
-        }
-
-        let report = models.Report.build({ ...rest, publisherId });
+        let report = models.Report.build({
+          ...rest,
+          publisherId,
+        });
 
         report = await report.save({
           ...opts,
           returning: true,
         });
 
-        await report.setReportTags(reportTags, { ...opts });
+        await report.setReportTags(
+          await models.ReportTag.findOrCreateByNames(tagNames || [], opts),
+          opts
+        );
 
         return { report };
       });
@@ -127,20 +116,8 @@ export default {
 
         if (tagNames) {
           await report.setReportTags(
-            await Promise.all(
-              tagNames.map(async (tagName) => {
-                const attrs = {
-                  name: tagName.trim(),
-                };
-                const tags = await models.ReportTag.findOrCreate({
-                  ...opts,
-                  where: attrs,
-                  defaults: attrs,
-                });
-                return tags[0];
-              }),
-              opts
-            )
+            await models.ReportTag.findOrCreateByNames(tagNames, opts),
+            opts
           );
         }
 
