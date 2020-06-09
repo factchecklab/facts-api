@@ -17,7 +17,21 @@ export default gql`
       id: ID!
     ): Report
 
-    searchRelatedReports(content: String): SearchRelatedReportConnection!
+    """
+    Search for related fact check reports by matching the original message
+    and original URLs of the report.
+    """
+    searchRelatedReports(
+      """
+      The original message to search.
+      """
+      originalMessage: String
+
+      """
+      The original URL to search.
+      """
+      originalUrl: URL
+    ): SearchRelatedReportConnection!
   }
 
   extend type Mutation {

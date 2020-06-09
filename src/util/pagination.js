@@ -31,10 +31,14 @@ export const parseRelayPaginationArgs = (args, opts = {}) => {
   };
 };
 
-export const makeRelayConnection = (edges, pargs) => {
-  const { limit, forward } = pargs;
-  const hasMore = edges.length > limit;
-  edges.splice(limit);
+export const makeRelayConnection = (edges, pargs = null) => {
+  const limit = (pargs && pargs.limit) || 0;
+  const forward = pargs && pargs.forward !== undefined ? pargs.forward : true;
+  const hasMore = limit && edges.length > limit;
+
+  if (limit) {
+    edges.splice(limit);
+  }
 
   if (!forward) {
     edges.reverse();
