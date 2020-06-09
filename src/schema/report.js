@@ -176,6 +176,22 @@ export default gql`
     The tags of this fact check report.
     """
     tags: [String!]!
+
+    """
+    Original message that was fact checked by the publisher.
+
+    The original message is only available to the publisher who published
+    this fact check report.
+    """
+    originalMessage: String
+
+    """
+    Original URLs that were fact checked by the publisher.
+
+    The original URLs are only available to the publisher who published
+    this fact check report.
+    """
+    originalUrls: [URL!]
   }
 
   """
@@ -222,6 +238,16 @@ export default gql`
     The tags of this fact check report.
     """
     tags: [String!]!
+
+    """
+    Original message that was fact checked by the publisher.
+    """
+    originalMessage: String
+
+    """
+    Original URLs that were fact checked by the publisher.
+    """
+    originalUrls: [URL!]
   }
 
   """
@@ -278,6 +304,16 @@ export default gql`
     The tags of this fact check report.
     """
     tags: [String!]
+
+    """
+    Original message that was fact checked by the publisher.
+    """
+    originalMessage: String
+
+    """
+    Original URLs that were fact checked by the publisher.
+    """
+    originalUrls: [URL!]
   }
 
   """

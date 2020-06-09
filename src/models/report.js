@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+import { cleanUrl } from '../util/url';
 
 export default (sequelize, DataTypes) => {
   class Report extends Sequelize.Model {}
@@ -26,12 +27,30 @@ export default (sequelize, DataTypes) => {
       fullReportUrl: {
         type: DataTypes.TEXT,
         allowNull: true,
+        set(value) {
+          this.setDataValue('fullReportUrl', value ? cleanUrl(value) : null);
+        },
       },
       publishedAt: {
         type: DataTypes.DATE,
         field: 'published_at',
         allowNull: false,
         defaultValue: Sequelize.NOW,
+      },
+      originalMessage: {
+        type: DataTypes.TEXT,
+        field: 'original_message',
+        allowNull: false,
+        defaultValue: '',
+      },
+      originalUrls: {
+        type: DataTypes.ARRAY(DataTypes.TEXT),
+        field: 'original_urls',
+        allowNull: false,
+        defaultValue: [],
+        set(value) {
+          this.setDataValue('originalUrls', (value || []).map(cleanUrl));
+        },
       },
     },
     {
