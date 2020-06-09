@@ -8,12 +8,6 @@ const reindex = async () => {
       return hooks.Report.save(client, report);
     })
   );
-  const topics = await models.Topic.findAll();
-  await Promise.all(
-    topics.map((topic) => {
-      return hooks.Topic.save(client, topic);
-    })
-  );
 };
 
 (async function main() {
