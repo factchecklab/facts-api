@@ -1,3 +1,4 @@
+import { ValidationError } from 'apollo-server-koa';
 import { NotFound } from './errors';
 import {
   stringifyCursor,
@@ -5,6 +6,7 @@ import {
   makeRelayConnection,
 } from '../util/pagination';
 import { buildPagableQuery } from '../models/pagination';
+import { cleanUrl } from '../util/url';
 
 export default {
   Query: {
@@ -37,26 +39,35 @@ export default {
 
     searchRelatedReports: async (
       parent,
-      { reportId, content, offset, limit },
+      { originalMessage, originalUrl },
       { models, search, elastic }
     ) => {
-      let report = null;
-      if (reportId) {
-        report = await models.Report.findByPk(reportId);
-        if (!report) {
-          throw new NotFound(
-            `Could not find a Report with the id '${reportId}'`
-          );
-        }
+      if (!originalMessage && !originalUrl) {
+        throw new ValidationError(
+          'Either "originalMessage" or "originalUrl" must be specified.'
+        );
       }
-      const ids = await search.Report.searchSimilarByContent(
+
+      const docs = await search.Report.searchSimilarByContent(
         elastic,
-        report ? report.documentId : null,
-        content,
-        offset,
-        limit
+        originalMessage,
+        originalUrl ? cleanUrl(originalUrl) : undefined,
+        0,
+        5
       );
-      return models.Report.findAllByDocumentIds(ids);
+
+      const result = await models.Report.findAllByPk(
+        docs.map((doc) => doc._source.id)
+      );
+      return makeRelayConnection(
+        result.map((item, i) => {
+          return {
+            cursor: '',
+            score: docs[i]._score,
+            node: item,
+          };
+        })
+      );
     },
   },
 
@@ -71,31 +82,20 @@ export default {
           throw new NotFound(`Cannot find publisher with id "${publisherId}"`);
         }
 
-        let reportTags = [];
-        if (tagNames) {
-          reportTags = await Promise.all(
-            tagNames.map(async (tagName) => {
-              const attrs = {
-                name: tagName.trim(),
-              };
-              const tags = await models.ReportTag.findOrCreate({
-                ...opts,
-                where: attrs,
-                defaults: attrs,
-              });
-              return tags[0];
-            })
-          );
-        }
-
-        let report = models.Report.build({ ...rest, publisherId });
+        let report = models.Report.build({
+          ...rest,
+          publisherId,
+        });
 
         report = await report.save({
           ...opts,
           returning: true,
         });
 
-        await report.setReportTags(reportTags, { ...opts });
+        await report.setReportTags(
+          await models.ReportTag.findOrCreateByNames(tagNames || [], opts),
+          opts
+        );
 
         return { report };
       });
@@ -116,20 +116,8 @@ export default {
 
         if (tagNames) {
           await report.setReportTags(
-            await Promise.all(
-              tagNames.map(async (tagName) => {
-                const attrs = {
-                  name: tagName.trim(),
-                };
-                const tags = await models.ReportTag.findOrCreate({
-                  ...opts,
-                  where: attrs,
-                  defaults: attrs,
-                });
-                return tags[0];
-              }),
-              opts
-            )
+            await models.ReportTag.findOrCreateByNames(tagNames, opts),
+            opts
           );
         }
 

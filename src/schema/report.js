@@ -17,7 +17,21 @@ export default gql`
       id: ID!
     ): Report
 
-    searchRelatedReports(content: String): SearchRelatedReportConnection!
+    """
+    Search for related fact check reports by matching the original message
+    and original URLs of the report.
+    """
+    searchRelatedReports(
+      """
+      The original message to search.
+      """
+      originalMessage: String
+
+      """
+      The original URL to search.
+      """
+      originalUrl: URL
+    ): SearchRelatedReportConnection!
   }
 
   extend type Mutation {
@@ -176,6 +190,22 @@ export default gql`
     The tags of this fact check report.
     """
     tags: [String!]!
+
+    """
+    Original message that was fact checked by the publisher.
+
+    The original message is only available to the publisher who published
+    this fact check report.
+    """
+    originalMessage: String
+
+    """
+    Original URLs that were fact checked by the publisher.
+
+    The original URLs are only available to the publisher who published
+    this fact check report.
+    """
+    originalUrls: [URL!]
   }
 
   """
@@ -222,6 +252,16 @@ export default gql`
     The tags of this fact check report.
     """
     tags: [String!]!
+
+    """
+    Original message that was fact checked by the publisher.
+    """
+    originalMessage: String
+
+    """
+    Original URLs that were fact checked by the publisher.
+    """
+    originalUrls: [URL!]
   }
 
   """
@@ -278,6 +318,16 @@ export default gql`
     The tags of this fact check report.
     """
     tags: [String!]
+
+    """
+    Original message that was fact checked by the publisher.
+    """
+    originalMessage: String
+
+    """
+    Original URLs that were fact checked by the publisher.
+    """
+    originalUrls: [URL!]
   }
 
   """
