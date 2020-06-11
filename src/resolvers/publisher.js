@@ -34,63 +34,6 @@ export default {
       }
       return publisher;
     },
-    /*
-    reports: async (
-      parent,
-      { keyword, closed, offset, limit },
-      { models, search, elastic }
-    ) => {
-      if (keyword) {
-        const ids = await search.Report.searchByKeyword(
-          elastic,
-          keyword,
-          closed,
-          offset,
-          limit
-        );
-        return models.Report.findAllByDocumentIds(ids);
-      } else {
-        let where = {
-          closed: closed || false,
-        };
-
-        return models.Report.findAll({
-          where,
-          offset: offset || 0,
-          limit: Math.min(limit || 20, 100),
-          order: [['createdAt', 'desc']],
-        });
-      }
-    },
-
-    report: (parent, { id }, { models }) => {
-      return models.Report.findByPk(id);
-    },
-
-    searchRelatedReports: async (
-      parent,
-      { reportId, content, offset, limit },
-      { models, search, elastic }
-    ) => {
-      let report = null;
-      if (reportId) {
-        report = await models.Report.findByPk(reportId);
-        if (!report) {
-          throw new NotFound(
-            `Could not find a Report with the id '${reportId}'`
-          );
-        }
-      }
-      const ids = await search.Report.searchSimilarByContent(
-        elastic,
-        report ? report.documentId : null,
-        content,
-        offset,
-        limit
-      );
-      return models.Report.findAllByDocumentIds(ids);
-    },
-    */
   },
 
   Publisher: {
