@@ -251,7 +251,7 @@ export default gql`
     """
     The tags of this fact check report.
     """
-    tags: [String!]!
+    tags: [String!]
 
     """
     Original message that was fact checked by the publisher.
