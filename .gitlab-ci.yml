@@ -82,9 +82,6 @@ build_image:
 
 .deploy: &deploy_template
   image: dtzar/helm-kubectl:3.2.1
-  environment:
-    kubernetes:
-      namespace: factchecklab
   variables:
     GCR_IMAGE: $GCR_REGISTRY/$GCR_PROJECT_ID/$CI_PROJECT_NAME
   before_script:
@@ -103,6 +100,8 @@ staging:
   stage: staging
   environment:
     name: staging
+    kubernetes:
+      namespace: factchecklab
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
 
@@ -111,6 +110,8 @@ production:
   stage: production
   environment:
     name: production
+    kubernetes:
+      namespace: factchecklab
   allow_failure: false
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
