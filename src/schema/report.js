@@ -197,7 +197,7 @@ export default gql`
     The original message is only available to the publisher who published
     this fact check report.
     """
-    originalMessage: String
+    originalMessage: String @cacheControl(scope: PRIVATE)
 
     """
     Original URLs that were fact checked by the publisher.
@@ -205,7 +205,7 @@ export default gql`
     The original URLs are only available to the publisher who published
     this fact check report.
     """
-    originalUrls: [URL!]
+    originalUrls: [URL!] @cacheControl(scope: PRIVATE)
   }
 
   """
@@ -251,7 +251,7 @@ export default gql`
     """
     The tags of this fact check report.
     """
-    tags: [String!]!
+    tags: [String!]
 
     """
     Original message that was fact checked by the publisher.
