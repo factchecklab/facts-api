@@ -19,6 +19,9 @@ const server = new ApolloServer({
   schemaDirectives: directives,
   introspection: true,
   plugins: [errorLoggingPlugin],
+  cacheControl: {
+    defaultMaxAge: parseInt(process.env.DEFAULT_CACHE_CONTROL_MAX_AGE) || 0,
+  },
 });
 
 // The `listen` method launches a web server.
