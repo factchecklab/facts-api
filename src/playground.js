@@ -9,7 +9,9 @@ export default {
     {
       name: 'List reports',
       responses: ['{}'],
-      endpoint: '',
+      endpoint:
+        process.env.GRAPHQL_PLAYGROUND_ENDPOINT ||
+        'https://api.factchecklab.org/graphql/facts',
       query: [
         '# List reports',
         print(gql`
