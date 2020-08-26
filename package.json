@@ -2,7 +2,11 @@
   "name": "facts-api",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "license": "MIT",
+  "author": {
+    "name": "tech@factchecklab",
+    "email": "tech@factchecklab.org"
+  },
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "NODE_ENV=production node dist/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
@@ -11,8 +15,7 @@
     "seed:demo": "sequelize db:seed --seed 20200402145342-demo",
     "lint": "eslint --ext .js --ignore-path .eslintignore .",
     "test": "jest",
-    "reindex": "babel-node src/bin/reindex.js",
-    "generate:search-query-parser": "nearleyc src/util/search-query-parser/grammar.ne -o src/util/search-query-parser/grammar.js"
+    "reindex": "babel-node src/bin/reindex.js"
   },
   "bin": {
     "responselist-reindex": "./dist/bin/reindex.js"
@@ -29,7 +32,6 @@
     "graphql": "^14.6.0",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.26",
-    "nearley": "^2.19.3",
     "neat-url": "^1.0.9",
     "node-fetch": "^2.6.0",
     "normalize-url": "^5.0.0",
