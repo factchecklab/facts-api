@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 tech@factchecklab <tech@factchecklab.org>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 export const stringifyCursor = (cursor) => {
   return Buffer.from(JSON.stringify(cursor)).toString('base64');
 };
