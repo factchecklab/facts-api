@@ -43,16 +43,19 @@ export default gql`
     Create a new fact check report.
     """
     createReport(input: CreateReportInput!): CreateReportPayload!
+      @auth(requires: PUBLISHER)
 
     """
     Update an existing fact check report.
     """
     updateReport(input: UpdateReportInput!): UpdateReportPayload!
+      @auth(requires: PUBLISHER)
 
     """
     Delete an existing fact check report.
     """
     deleteReport(input: DeleteReportInput!): DeleteReportPayload!
+      @auth(requires: PUBLISHER)
   }
 
   """
@@ -201,7 +204,9 @@ export default gql`
     The original message is only available to the publisher who published
     this fact check report.
     """
-    originalMessage: String @cacheControl(scope: PRIVATE)
+    originalMessage: String
+      @auth(requires: PUBLISHER)
+      @cacheControl(scope: PRIVATE)
 
     """
     Original URLs that were fact checked by the publisher.
@@ -209,7 +214,9 @@ export default gql`
     The original URLs are only available to the publisher who published
     this fact check report.
     """
-    originalUrls: [URL!] @cacheControl(scope: PRIVATE)
+    originalUrls: [URL!]
+      @auth(requires: PUBLISHER)
+      @cacheControl(scope: PRIVATE)
   }
 
   """

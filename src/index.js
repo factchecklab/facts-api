@@ -11,6 +11,7 @@ import directives from './directives';
 import { errorLoggingPlugin } from './plugins/error-logging';
 import context from './context';
 import playground from './playground';
+import { getConsumer } from './util/kong';
 
 hooks.forEach((hook) => {
   const ctx = context();
@@ -19,7 +20,16 @@ hooks.forEach((hook) => {
 
 const server = new ApolloServer({
   typeDefs: schema,
-  context,
+  context: ({ req }) => {
+    const ctx = context();
+    return {
+      ...ctx,
+      consumer: getConsumer(
+        req,
+        process.env.CONSUMER_GROUP_PREFIX || undefined
+      ),
+    };
+  },
   resolvers,
   schemaDirectives: directives,
   introspection: !process.env.DISABLE_GRAPHQL_INTROSPECTION,
