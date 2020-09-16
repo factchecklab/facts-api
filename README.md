@@ -4,33 +4,69 @@ SPDX-FileCopyrightText: 2020 tech@factchecklab <tech@factchecklab.org>
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Maat Response API Server
+# Factcheck DB API
 
-## Getting Started
+The Factcheck DB is a database for exchanging information about fact check
+reports. The server expose this database with a GraphQL API.
 
-1. Copy .env from .env.sample
-2. Run yarn install
-2. Run yarn migrate
-3. Run yarn start
+## Features
 
-Or you can use `docker-compose up`. The API is available on port 4000.
+* Query fact check reports.
+* Find related fact check report with potential misinformation.
+* Publish fact check reports by publishers.
 
-To seed data, run `yarn seed:demo`, then `yarn reindex`.
+To try out the Factcheck DB API, head over to
+[GraphQL Playground](https://api.factchecklab.org/graphql/facts) and start
+querying!
 
-## TODOs
+## Developing
 
-The project is in active development. The current state of the project:
+### Requirements
 
-- [x] Prettier / Lint
-- [ ] Tests
-- [x] Build commands (babel emits js into dist directory)
-- [ ] CI / CD
-- [x] Database migration up/down
-- [x] Simple queries schema and resolver, like query all and fetch by one
-- [x] Simple graph traversal, like fetching topic responses
-- [x] Query schema to support application use cases
-- [x] Mutation schema to support application use cases
-- [ ] Support published state, showing/hiding objects for all users
-- [ ] Sorting by order field, to support which response appears first
-- [ ] Assets / Attachments
-- [ ] ElasticSearch connection
+* Node.js
+* PostgreSQL
+* ElasticSearch
+
+### Getting started
+
+First of all, create `.env` file which contains all the server settings. Copy
+from `.env.example` as an example. Check that all backing services are running
+beforehand.
+
+```
+$ yarn install
+$ yarn migrate
+$ yarn dev
+```
+
+If you use Docker, the repository contains a Docker Compose file which
+help you start the required services for you.
+
+```
+$ docker-compose up -d postgres elasticsearch
+$ docker-compose run --rm api yarn install
+$ docker-compose run --rm api yarn migrate
+$ docker-compose up app
+```
+
+The sercer listen at port 4000. Browse to `http://localhost:4000` for GraphQL
+Playground and use the same URL for GraphQL API endpoint.
+
+## Contributing
+
+We welcome contributions to our projects! You can ask questions or [file a bug
+report](https://gitlab.com/factchecklab/facts-api/-/issues/new) by creating an
+issue on GitLab. To contribute, fork this repository on
+GitLab and create a merge request.
+
+## Getting Help
+
+If you have questions, [file an issue](https://gitlab.com/factchecklab/facts-api/-/issues/new)
+in our repository on GitLab, you can
+also contact us at [tech@factchecklab.org](mailto:tech@factchecklab.org).
+
+## Copyright & License
+
+Copyright (c) 2020 tech@factchecklab.
+
+The source code is licensed under Affero General Public License Version 3.
