@@ -8,7 +8,6 @@ import hooks from './models/hooks';
 import schema from './schema';
 import resolvers from './resolvers';
 import directives from './directives';
-import { errorLoggingPlugin } from './plugins/error-logging';
 import context from './context';
 import playground from './playground';
 import { getConsumer } from './util/kong';
@@ -34,7 +33,6 @@ const server = new ApolloServer({
   schemaDirectives: directives,
   introspection: !process.env.DISABLE_GRAPHQL_INTROSPECTION,
   playground: !process.env.DISABLE_GRAPHQL_PLAYGROUND && playground,
-  plugins: [errorLoggingPlugin],
   cacheControl: {
     defaultMaxAge: parseInt(process.env.DEFAULT_CACHE_CONTROL_MAX_AGE) || 0,
   },
